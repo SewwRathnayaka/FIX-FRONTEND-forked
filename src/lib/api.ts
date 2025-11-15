@@ -2,7 +2,10 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // API Configuration - Load from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://fixfinder-backend-zrn7.onrender.com/api';
-const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '10000');
+// Increased timeout for Render free tier (cold starts can take 30-60 seconds)
+// Production: 60000ms (60s), Development: 30000ms (30s)
+const DEFAULT_TIMEOUT = import.meta.env.VITE_NODE_ENV === 'production' ? 60000 : 30000;
+const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || String(DEFAULT_TIMEOUT));
 const NODE_ENV = import.meta.env.VITE_NODE_ENV || 'development';
 
 // Create axios instance
@@ -40,7 +43,14 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle common errors silently
+    // Provide better error messages for timeout errors
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      console.error('⏱️ Request timeout:', {
+        url: error.config?.url,
+        timeout: API_TIMEOUT,
+        message: `Request took longer than ${API_TIMEOUT}ms. This is common on Render free tier due to cold starts.`
+      });
+    }
     return Promise.reject(error);
   }
 );
