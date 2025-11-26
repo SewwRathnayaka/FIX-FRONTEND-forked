@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import plumbing from "@/assets/images/plumbing.jpg";
 import carpentry from "@/assets/images/capentry.jpg";
 import electrical from "@/assets/images/electrical.jpg";
@@ -14,71 +15,80 @@ interface ServiceCardProps {
 
 const ServiceCard = ({ title, image, description }: ServiceCardProps) => {
   return (
-    <div className="bg-green-600 bg-opacity-80 rounded-lg overflow-hidden">
-      <div className="h-40 sm:h-48 overflow-hidden">
+    <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+      <div className="h-48 sm:h-56 overflow-hidden relative">
         <img 
           src={image} 
           alt={title} 
-          className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-green-600/80 via-green-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
-      <div className="p-4 sm:p-6">
-        <h3 className="text-white text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-center">{title}</h3>
-        <p className="text-sm sm:text-base text-green-100 mb-4 sm:mb-5">{description}</p>
-        <div className="flex justify-end">
-          <Link to={`/services/${title.toLowerCase()}`}>
-            <Button variant="ghost" size="sm" className="text-white hover:text-green-200">
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-          </Link>
-        </div>
+      <div className="p-6 sm:p-8">
+        <h3 className="text-gray-800 text-xl sm:text-2xl font-bold mb-3 text-center group-hover:text-green-600 transition-colors duration-300">{title}</h3>
+        <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center">{description}</p>
       </div>
     </div>
   );
 };
 
 const ServiceShowcase = () => {
+  const { t } = useTranslation();
+  
   const services = [
     {
-      title: "Carpentry",
+      key: "carpentry",
       image: carpentry,
-      description: "Expert carpentry services for furniture assembly, repairs, custom builds, and more."
+      titleKey: "homepage.services.carpentry.title",
+      descriptionKey: "homepage.services.carpentry.description"
     },
     {
-      title: "Plumbing",
+      key: "plumbing",
       image: plumbing,
-      description: "Professional plumbing solutions for leaks, installations, repairs, and maintenance."
+      titleKey: "homepage.services.plumbing.title",
+      descriptionKey: "homepage.services.plumbing.description"
     },
     {
-      title: "Electrical",
+      key: "electrical",
       image: electrical,
-      description: "Skilled electricians for installations, repairs, wiring, and electrical troubleshooting."
+      titleKey: "homepage.services.electrical.title",
+      descriptionKey: "homepage.services.electrical.description"
     }
   ];
 
   return (
-    <div className="py-12 sm:py-16 bg-green-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-2 px-2">MOST POPULAR SERVICES</h2>
-        <p className="text-sm sm:text-base text-gray-600 text-center mb-8 sm:mb-12 px-2">
-          From carpentry to electrical repairs, we've got you covered for all your home maintenance needs.
+    <div className="py-16 sm:py-20 md:py-24 bg-white relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-20 left-0 w-72 h-72 bg-green-100/30 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-0 w-96 h-96 bg-orange-100/30 rounded-full blur-3xl" />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 px-2">
+            <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+              {t('homepage.services.title')}
+            </span>
+          </h2>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-2 leading-relaxed">
+          {t('homepage.services.subtitle')}
         </p>
+        </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 mb-12">
           {services.map((service) => (
             <ServiceCard 
-              key={service.title}
-              title={service.title}
+              key={service.key}
+              title={t(service.titleKey)}
               image={service.image}
-              description={service.description}
+              description={t(service.descriptionKey)}
             />
           ))}
         </div>
         
-        <div className="flex justify-center mt-8 sm:mt-12">
+        <div className="flex justify-center">
           <Link to="/services#top" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white px-6 sm:px-8 text-sm sm:text-base">
-              View All Services
+            <Button className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg font-semibold shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105 rounded-full">
+              {t('homepage.services.viewAll')}
             </Button>
           </Link>
         </div>

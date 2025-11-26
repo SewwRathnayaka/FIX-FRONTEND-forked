@@ -12,7 +12,7 @@ const notifications = [
     type: "job" as NotificationType,
     title: "New Job Scheduled",
     description:
-      "You have a new plumbing job scheduled with Sarah Johnson at 123 Oak Street tomorrow at 9:00 AM.",
+      "You have a new plumbing job scheduled with Samanthi Fonseka at 123 Oak Street tomorrow at 9:00 AM.",
     time: "Today, 10:45 AM",
     unread: true,
     actions: [

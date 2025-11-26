@@ -1,83 +1,92 @@
-
+import { useState, useEffect } from "react";
 import ClientDashboardLayout from "@/components/client/ClientDashboardLayout";
+import { useUser } from '@clerk/clerk-react';
+import { BookingsAPI } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 const ClientServiceHistory = () => {
-  const services = [
-    {
-      id: 1,
-      name: "Plumbing Repair",
-      handyman: "Kamal Perera",
-      date: "January 10, 2023",
-      status: "Completed",
-      price: "$125.00",
-      handymanPhoto: "https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    {
-      id: 2,
-      name: "Electrical Installation",
-      handyman: "Nimal Gunasinghe",
-      date: "December 15, 2022",
-      status: "Completed",
-      price: "$210.00",
-      handymanPhoto: "https://randomuser.me/api/portraits/men/55.jpg"
-    },
-    {
-      id: 3,
-      name: "Furniture Assembly",
-      handyman: "Udayanga Perera",
-      date: "November 3, 2022",
-      status: "Canceled",
-      price: "$90.00",
-      handymanPhoto: "https://randomuser.me/api/portraits/men/76.jpg"
-    },
-    {
-      id: 4,
-      name: "Painting Service",
-      handyman: "Kalum Sirimal",
-      date: "August 24, 2022",
-      status: "Completed",
-      price: "$450.00",
-      handymanPhoto: "https://randomuser.me/api/portraits/men/41.jpg"
-    }
-  ];
+  const { user } = useUser();
+  const { t } = useTranslation();
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCompletedBookings = async () => {
+      if (!user?.id) return;
+
+      try {
+        setIsLoading(true);
+        const response = await BookingsAPI.getMyBookings();
+        if (response.success && response.data) {
+          // Filter only completed bookings
+          const completedBookings = response.data.filter((booking: any) => 
+            booking.status === 'completed'
+          );
+          setBookings(completedBookings);
+        }
+      } catch (error) {
+        console.error('Error fetching completed bookings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCompletedBookings();
+  }, [user?.id]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <ClientDashboardLayout title="Service History">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-8 text-center">
+          <p className="text-gray-600">Loading service history...</p>
+        </div>
+      </ClientDashboardLayout>
+    );
+  }
 
   return (
     <ClientDashboardLayout title="Service History">
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="space-y-6">
-          {services.map(service => (
-            <div key={service.id} className="flex items-start justify-between border-b pb-6 last:border-b-0 last:pb-0">
-              <div className="flex items-start">
-                <div className="w-12 h-12 rounded-full overflow-hidden mr-4">
-                  <img 
-                    src={service.handymanPhoto} 
-                    alt={service.handyman} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">{service.name}</h3>
-                  <p className="text-gray-600 text-sm mt-1">by {service.handyman}</p>
-                  <p className="text-gray-500 text-sm mt-1">Date: {service.date}</p>
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 sm:p-8">
+        {bookings.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 text-lg">No completed services yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {bookings.map(booking => (
+              <div key={booking._id} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-6 border-2 border-gray-100 hover:border-green-300 hover:shadow-lg transition-all duration-300">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg flex-shrink-0">
+                      {booking.providerName?.charAt(0) || 'H'}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-extrabold text-lg text-gray-800 mb-1">{booking.serviceName || 'Service'}</h3>
+                      <p className="text-gray-600 text-sm mb-1">by {booking.providerName || 'Handyman'}</p>
+                      <p className="text-gray-500 text-sm">Date: {formatDate(booking.scheduledTime || booking.createdAt)}</p>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className="inline-block px-4 py-2 rounded-full text-xs font-bold bg-green-100 text-green-700 border-2 border-green-300 mb-2">
+                      Completed
+                    </span>
+                    <p className="font-extrabold text-lg text-gray-800 mt-2">
+                      ${booking.fee ? booking.fee.toFixed(2) : '0.00'}
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <span 
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                    service.status === 'Completed' 
-                      ? 'bg-green-100 text-green-700' 
-                      : service.status === 'Canceled'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                  }`}
-                >
-                  {service.status}
-                </span>
-                <p className="font-semibold mt-2">{service.price}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </ClientDashboardLayout>
   );

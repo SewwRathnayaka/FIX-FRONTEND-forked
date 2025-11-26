@@ -54,6 +54,53 @@ const getStatusBadgeStyle = (status: string): string => {
   }
 };
 
+// Helper function to map service names from API to translation keys
+const getServiceTranslationKey = (serviceName: string, type: 'name' | 'description' = 'name'): string | null => {
+  const name = serviceName.toLowerCase().trim();
+  const suffix = type === 'name' ? 'name' : 'description';
+  
+  // Map service names to translation keys (case-insensitive, handles variations)
+  if (name.includes('appliance') && name.includes('repair')) return `services.serviceList.applianceRepair.${suffix}`;
+  if (name === 'carpentry') return `services.serviceList.carpentry.${suffix}`;
+  if (name === 'cleaning' || name.includes('cleaning')) return `services.serviceList.cleaning.${suffix}`;
+  if (name === 'electrical' || name.includes('electrical')) return `services.serviceList.electrical.${suffix}`;
+  if (name === 'gardening' || name.includes('garden')) return `services.serviceList.gardening.${suffix}`;
+  if ((name === 'home repair' || name.includes('home repair')) && !name.includes('window')) return `services.serviceList.homeRepair.${suffix}`;
+  if (name === 'painting' || name.includes('paint')) return `services.serviceList.painting.${suffix}`;
+  if (name === 'plumbing' || name.includes('plumb')) return `services.serviceList.plumbing.${suffix}`;
+  if (name === 'roofing' || name.includes('roof')) return `services.serviceList.roofing.${suffix}`;
+  if (name === 'window cleaning' || (name.includes('window') && name.includes('clean'))) return `services.serviceList.windowCleaning.${suffix}`;
+  if (name === 'pest control' || (name.includes('pest') && name.includes('control'))) return `services.serviceList.pestControl.${suffix}`;
+  if (name === 'landscaping' || name.includes('landscap')) return `services.serviceList.landscaping.${suffix}`;
+  if (name === 'security' || name.includes('secur')) return `services.serviceList.security.${suffix}`;
+  if (name === 'hvac' || name.includes('hvac') || (name.includes('heating') && name.includes('cooling'))) return `services.serviceList.hvac.${suffix}`;
+  if (name === 'renovation' || name.includes('renovation') || name.includes('remodel')) return `services.serviceList.renovation.${suffix}`;
+  
+  return null;
+};
+
+// Helper function to get translated service name
+const getTranslatedServiceName = (serviceName: string, t: (key: string) => string): string => {
+  const translationKey = getServiceTranslationKey(serviceName, 'name');
+  if (translationKey) {
+    const translated = t(translationKey);
+    // If translation returns the key itself, it means translation is missing, use original name
+    return translated !== translationKey ? translated : serviceName;
+  }
+  return serviceName;
+};
+
+// Helper function to get translated service description
+const getTranslatedServiceDescription = (serviceName: string, t: (key: string) => string): string | null => {
+  const translationKey = getServiceTranslationKey(serviceName, 'description');
+  if (translationKey) {
+    const translated = t(translationKey);
+    // If translation returns the key itself, it means translation is missing, return null
+    return translated !== translationKey ? translated : null;
+  }
+  return null;
+};
+
 // Helper function to get service icons based on service name
 const getServiceIcon = (serviceName: string): string => {
   const name = serviceName.toLowerCase();
@@ -389,7 +436,8 @@ const ClientDashboard = () => {
     );
   }
 
-  return <ClientDashboardLayout title={t("client.dashboard.welcome", { name: displayName })} subtitle={t("client.dashboard.subtitle")} showHomeIcon={false} showHandymanButton={true}>
+  return (
+    <ClientDashboardLayout title={t("client.dashboard.welcome", { name: displayName })} subtitle={t("client.dashboard.subtitle")} showHomeIcon={false} showHandymanButton={true}>
         {/* Profile Completion Segment */}
         {clientData && (() => {
           // Check if profile is incomplete (missing required fields)
@@ -407,71 +455,76 @@ const ClientDashboard = () => {
           }
           
           return (
-            <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
+            <div className="mb-8 p-6 sm:p-8 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border-2 border-blue-200/50 shadow-xl relative overflow-hidden">
+              {/* Decorative background elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full blur-2xl" />
+              
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-blue-900 mb-2">
                     Let's complete your profile together! 
                   </h3>
-                  <p className="text-blue-700 text-sm">
+                    <p className="text-blue-700 text-sm sm:text-base">
                     Please provide your address and mobile number to begin placing bookings easily.
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     {completionPercentage}%
                   </div>
-                  <div className="text-xs text-blue-500">Complete</div>
+                    <div className="text-xs sm:text-sm font-semibold text-blue-500">Complete</div>
                 </div>
               </div>
               
               {/* Progress Bar */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-xs text-blue-600 mb-2">
+                <div className="mb-6">
+                  <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-blue-600 mb-2">
                   <span>Profile Progress</span>
                   <span>Step {profileCompletion + 1} of 3</span>
                 </div>
-                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div className="w-full bg-blue-200 rounded-full h-3 shadow-inner">
                   <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500 shadow-lg"
                     style={{ width: `${completionPercentage}%` }}
                   ></div>
                 </div>
               </div>
 
               {/* Profile Fields Status */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className={`flex items-center p-3 rounded-lg ${clientData.name ? 'bg-green-100 border border-green-200' : 'bg-orange-100 border border-orange-200'}`}>
-                  <div className={`w-3 h-3 rounded-full mr-3 ${clientData.name ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className={`flex items-center p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ${clientData.name ? 'bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300' : 'bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300'}`}>
+                    <div className={`w-4 h-4 rounded-full mr-4 shadow-lg ${clientData.name ? 'bg-green-500' : 'bg-orange-500'}`}></div>
                   <div>
-                    <div className={`text-sm font-medium ${clientData.name ? 'text-green-800' : 'text-orange-800'}`}>
+                      <div className={`text-sm sm:text-base font-bold ${clientData.name ? 'text-green-800' : 'text-orange-800'}`}>
                       Full Name
                     </div>
-                    <div className={`text-xs ${clientData.name ? 'text-green-600' : 'text-orange-600'}`}>
+                      <div className={`text-xs sm:text-sm font-medium ${clientData.name ? 'text-green-600' : 'text-orange-600'}`}>
                       {clientData.name ? '✓ Completed' : 'Missing'}
                     </div>
                   </div>
                 </div>
 
-                <div className={`flex items-center p-3 rounded-lg ${clientData.mobileNumber ? 'bg-green-100 border border-green-200' : 'bg-orange-100 border border-orange-200'}`}>
-                  <div className={`w-3 h-3 rounded-full mr-3 ${clientData.mobileNumber ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+                  <div className={`flex items-center p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ${clientData.mobileNumber ? 'bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300' : 'bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300'}`}>
+                    <div className={`w-4 h-4 rounded-full mr-4 shadow-lg ${clientData.mobileNumber ? 'bg-green-500' : 'bg-orange-500'}`}></div>
                   <div>
-                    <div className={`text-sm font-medium ${clientData.mobileNumber ? 'text-green-800' : 'text-orange-800'}`}>
+                      <div className={`text-sm sm:text-base font-bold ${clientData.mobileNumber ? 'text-green-800' : 'text-orange-800'}`}>
                       Mobile Number
                     </div>
-                    <div className={`text-xs ${clientData.mobileNumber ? 'text-green-600' : 'text-orange-600'}`}>
+                      <div className={`text-xs sm:text-sm font-medium ${clientData.mobileNumber ? 'text-green-600' : 'text-orange-600'}`}>
                       {clientData.mobileNumber ? '✓ Completed' : 'Missing'}
                     </div>
                   </div>
                 </div>
 
-                <div className={`flex items-center p-3 rounded-lg ${clientData.location ? 'bg-green-100 border border-green-200' : 'bg-orange-100 border border-orange-200'}`}>
-                  <div className={`w-3 h-3 rounded-full mr-3 ${clientData.location ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+                  <div className={`flex items-center p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 ${clientData.location ? 'bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300' : 'bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300'}`}>
+                    <div className={`w-4 h-4 rounded-full mr-4 shadow-lg ${clientData.location ? 'bg-green-500' : 'bg-orange-500'}`}></div>
                   <div>
-                    <div className={`text-sm font-medium ${clientData.location ? 'text-green-800' : 'text-orange-800'}`}>
+                      <div className={`text-sm sm:text-base font-bold ${clientData.location ? 'text-green-800' : 'text-orange-800'}`}>
                       Address
                     </div>
-                    <div className={`text-xs ${clientData.location ? 'text-green-600' : 'text-orange-600'}`}>
+                      <div className={`text-xs sm:text-sm font-medium ${clientData.location ? 'text-green-600' : 'text-orange-600'}`}>
                       {clientData.location ? '✓ Completed' : 'Missing'}
                     </div>
                   </div>
@@ -479,16 +532,17 @@ const ClientDashboard = () => {
               </div>
 
               {/* Call to Action */}
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-blue-600">
-                  <span className="font-medium">💡 {t("client.dashboard.profileTip")}:</span> {t("client.dashboard.profileTipMessage")}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="text-sm sm:text-base text-blue-700 font-medium">
+                    <span className="font-bold">💡 {t("client.dashboard.profileTip")}:</span> {t("client.dashboard.profileTipMessage")}
                 </div>
                 <Button 
                   onClick={() => navigate('/client/profile')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold"
                 >
                   {t("client.dashboard.completeProfile")}
                 </Button>
+                </div>
               </div>
             </div>
           );
@@ -501,44 +555,48 @@ const ClientDashboard = () => {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={t("client.dashboard.searchPlaceholder")}
-          className="pl-10"
+            className="pl-12 pr-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-md hover:shadow-lg bg-white"
         />
-         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
        </div>
 
       {/* Search Results */}
       {search.trim() && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">{t("client.dashboard.searchResults")}</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold mb-6">
+            <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+              {t("client.dashboard.searchResults")}
+            </span>
+          </h2>
           {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span>{t("client.dashboard.loadingTitle")}</span>
+            <div className="flex items-center justify-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-6 w-6 animate-spin text-green-600" />
+                <span className="text-gray-700 font-medium">{t("client.dashboard.loadingTitle")}</span>
               </div>
             </div>
           ) : error ? (
-            <div className="text-center py-8">
-              <p className="text-red-600 mb-4">{t("client.dashboard.failedServices")}</p>
-              <p className="text-sm text-gray-500">
+            <div className="text-center py-12 bg-red-50/80 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-red-200">
+              <p className="text-red-600 mb-4 font-semibold text-lg">{t("client.dashboard.failedServices")}</p>
+              <p className="text-sm text-gray-600">
                 {error.message || t("client.dashboard.failedServicesHint")}
               </p>
             </div>
           ) : filteredServices.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {filteredServices.map((service: any) => (
                 <div
                   key={service._id || service.serviceId}
-                  className="flex flex-col items-center gap-3 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105 p-4 border border-gray-100"
+                  className="flex flex-col items-center gap-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 p-5 border border-gray-100"
                   onClick={() => navigate("/client/service-details", { state: { service } })}
                 >
                   {/* Service Image Container */}
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center shadow-inner">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-orange-100 flex items-center justify-center shadow-lg">
                     {service.imageUrl ? (
                       <img
                         src={service.imageUrl}
                         alt={service.name}
-                        className="w-12 h-12 object-cover rounded-full shadow-sm"
+                        className="w-14 h-14 object-cover rounded-full shadow-md"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
@@ -548,19 +606,19 @@ const ClientDashboard = () => {
                     ) : null}
                     
                     {/* Fallback Icon */}
-                    <span className={`text-3xl ${service.imageUrl ? 'hidden' : ''}`}>
+                    <span className={`text-4xl ${service.imageUrl ? 'hidden' : ''}`}>
                       {getServiceIcon(service.name)}
                     </span>
                   </div>
                   
                   {/* Service Name */}
-                  <span className="font-bold text-gray-800 text-center text-sm leading-tight">
-                    {service.name}
+                  <span className="font-bold text-gray-800 text-center text-sm sm:text-base leading-tight">
+                    {getTranslatedServiceName(service.name, t)}
                   </span>
 
                   {/* Usage Count */}
                   {service.usageCount > 0 && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 font-medium">
                       {t("client.dashboard.timesUsed", { count: service.usageCount })}
                     </span>
                   )}
@@ -568,45 +626,63 @@ const ClientDashboard = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500">{t("client.dashboard.noServicesMatch", { search })}</p>
+            <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
+              <p className="text-gray-600 font-medium">{t("client.dashboard.noServicesMatch", { search })}</p>
             </div>
           )}
         </div>
       )}
       
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">{t("client.dashboard.popularServices")}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="mb-8 relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green-100/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-100/30 rounded-full blur-3xl" />
+        
+        <div className="relative z-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold mb-6">
+            <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+              {t("client.dashboard.popularServices")}
+            </span>
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
           {popularServices.map(service => (
                          <div 
                key={service.id} 
-               className="bg-white p-4 rounded-lg shadow-sm flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-shadow" 
+                className="bg-white/80 backdrop-blur-md p-5 rounded-2xl shadow-xl hover:shadow-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 border border-gray-100" 
                onClick={() => handleServiceClick(service)}
              >
-              <div className="text-3xl mb-2">{service.icon}</div>
-              <div className="text-sm font-medium text-center">{service.name}</div>
+                <div className="text-4xl mb-3 drop-shadow-lg">{service.icon}</div>
+                <div className="text-sm sm:text-base font-bold text-center text-gray-800">{getTranslatedServiceName(service.name, t)}</div>
               {service.usageCount > 0 && (
-                <div className="text-xs text-gray-500 mt-1">
-                  {service.usageCount} times used
+                  <div className="text-xs text-gray-500 mt-2 font-medium">
+                  {t("client.dashboard.timesUsed", { count: service.usageCount })}
                 </div>
               )}
             </div>
           ))}
+          </div>
         </div>
       </div>
       
       <div className="mb-8 space-y-4">
-        <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-6" onClick={() => navigate("/client/service-catalog")}>
+        <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-6 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 font-bold text-lg" onClick={() => navigate("/client/service-catalog")}>
           {t("client.dashboard.seeAllServices")}
         </Button>
-        
       </div>
       
              {/* Your Bookings Section */}
-      <div className="mb-8">
-         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">{t("client.dashboard.yourBookings")}</h2>
+      <div className="mb-8 relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-green-100/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-100/20 rounded-full blur-3xl" />
+        
+        <div className="relative z-10">
+         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+          <h2 className="text-2xl sm:text-3xl font-extrabold">
+            <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+              {t("client.dashboard.yourBookings")}
+            </span>
+          </h2>
            <Button
              variant="outline"
              size="sm"
@@ -615,7 +691,7 @@ const ClientDashboard = () => {
                refetchBookings();
              }}
              disabled={isLoadingBookings}
-             className="flex items-center gap-2"
+             className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-2 border-green-500 text-green-700 hover:bg-green-50 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 py-2"
            >
              {isLoadingBookings ? (
                <Loader2 className="h-4 w-4 animate-spin" />
@@ -627,34 +703,34 @@ const ClientDashboard = () => {
          </div>
         
         {!user ? (
-          <div className="text-center py-8 bg-gray-50 rounded-lg">
-            <p className="text-gray-500 mb-2">{t("client.dashboard.signInPrompt")}</p>
+          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100">
+            <p className="text-gray-600 mb-2 font-semibold text-lg">{t("client.dashboard.signInPrompt")}</p>
           </div>
         ) : isLoadingBookings ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>{t("client.dashboard.loadingBookings")}</span>
+          <div className="flex items-center justify-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-green-600" />
+              <span className="text-gray-700 font-medium">{t("client.dashboard.loadingBookings")}</span>
             </div>
           </div>
         ) : bookingsError ? (
-          <div className="text-center py-8 bg-red-50 rounded-lg border border-red-200">
-            <p className="text-red-600 mb-2">{t("client.dashboard.failedBookings")}</p>
-            <p className="text-sm text-red-500 mb-3">{bookingsError.message}</p>
+          <div className="text-center py-12 bg-red-50/80 backdrop-blur-sm rounded-2xl border-2 border-red-200 shadow-xl">
+            <p className="text-red-600 mb-2 font-bold text-lg">{t("client.dashboard.failedBookings")}</p>
+            <p className="text-sm text-red-500 mb-4">{bookingsError.message}</p>
             <Button 
               onClick={() => window.location.reload()}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold px-6 py-2"
             >
               {t("client.dashboard.retry")}
             </Button>
           </div>
         ) : processedBookings.length === 0 ? (
-          <div className="text-center py-8 bg-gray-50 rounded-lg">
-            <p className="text-gray-500 mb-2">{t("client.dashboard.noBookings")}</p>
-            <p className="text-sm text-gray-400">{t("client.dashboard.noBookingsHint")}</p>
+          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100">
+            <p className="text-gray-600 mb-2 font-semibold text-lg">{t("client.dashboard.noBookings")}</p>
+            <p className="text-sm text-gray-500 mb-4">{t("client.dashboard.noBookingsHint")}</p>
             <Button 
               onClick={() => navigate("/client/service-catalog")}
-              className="mt-3 bg-orange-500 hover:bg-orange-600 text-white"
+              className="mt-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold px-6 py-2"
             >
               {t("client.dashboard.bookService")}
             </Button>
@@ -668,29 +744,33 @@ const ClientDashboard = () => {
                 {categorizedBookings.actionRequired.length > 0 ? (
                   // Show Action Required when there are bookings needing action
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
-                      <h3 className="text-lg font-semibold text-gray-800">Action Required</h3>
-                      <div className="flex items-center gap-2 px-3 py-1 bg-orange-50 border border-orange-200 rounded-full">
-                        <svg className="h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                      <div className="w-2 h-10 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full shadow-lg"></div>
+                      <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+                        <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+                          Action Required
+                        </span>
+                      </h3>
+                      <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-orange-300 rounded-full shadow-md">
+                        <svg className="h-5 w-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                         </svg>
-                        <span className="text-sm font-medium text-orange-700">{categorizedBookings.actionRequired.length} booking(s) need your attention</span>
+                        <span className="text-sm font-bold text-orange-700">{categorizedBookings.actionRequired.length} booking(s) need your attention</span>
                       </div>
                     </div>
                     
                     <div className="space-y-4">
                       {categorizedBookings.actionRequired.map(booking => (
                         <div key={booking._id} 
-                          className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                          className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-orange-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
                         >
-                          <div className="p-6">
+                          <div className="p-6 sm:p-8">
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                  <h4 className="font-semibold text-gray-900">{booking.serviceCategory || 'Service'}</h4>
-                                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
+                                <div className="flex flex-wrap items-center gap-3 mb-3">
+                                  <div className="w-4 h-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full shadow-lg"></div>
+                                  <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceCategory || 'Service'}</h4>
+                                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
                                     {getStatusDisplayText(booking.status)}
                                   </span>
                                 </div>
@@ -732,12 +812,12 @@ const ClientDashboard = () => {
                                     e.stopPropagation();
                                     handleChat(booking);
                                   }} 
-                                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                  className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                                 >
                                    View Details
                                 </Button>
                                 <Button
-                                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2"
+                                  className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-bold"
                                   onClick={() => {
                                     if (booking.status === 'accepted') {
                                       navigate(`/client/payment/${booking._id}`);
@@ -758,23 +838,27 @@ const ClientDashboard = () => {
                 ) : categorizedBookings.ongoing.length > 0 ? (
                   // Show Ongoing Bookings when there are no Action Required bookings
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
-                      <h3 className="text-lg font-semibold text-gray-800">Ongoing Bookings</h3>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-2 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-lg"></div>
+                      <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+                        <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                          Ongoing Bookings
+                        </span>
+                      </h3>
                     </div>
                     
                     <div className="space-y-4">
                       {categorizedBookings.ongoing.map(booking => (
                         <div key={booking._id} 
-                          className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                          className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-blue-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
                         >
-                          <div className="p-6">
+                          <div className="p-6 sm:p-8">
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                  <h4 className="font-semibold text-gray-900">{booking.serviceCategory || 'Service'}</h4>
-                                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
+                                <div className="flex flex-wrap items-center gap-3 mb-3">
+                                  <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-lg"></div>
+                                  <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceCategory || 'Service'}</h4>
+                                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
                                     {getStatusDisplayText(booking.status)}
                                   </span>
                                 </div>
@@ -817,14 +901,14 @@ const ClientDashboard = () => {
                                       e.stopPropagation();
                                       handleChat(booking);
                                     }} 
-                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                                   >
                                     <MessageSquare className="mr-1" size={16} /> Chat
                                   </Button>
                                 )}
                                 <Button
                                   variant="outline"
-                                  className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                                  className="px-6 py-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                                   onClick={() => handleBookingClick(booking)}
                                 >
                                   View Details
@@ -838,12 +922,12 @@ const ClientDashboard = () => {
                   </div>
                 ) : (
                   // Show empty state when no bookings
-                  <div className="text-center py-8 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500 mb-2">No active bookings</p>
-                    <p className="text-sm text-gray-400">Start by booking a service from our catalog</p>
+                  <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100">
+                    <p className="text-gray-600 mb-2 font-semibold text-lg">No active bookings</p>
+                    <p className="text-sm text-gray-500 mb-4">Start by booking a service from our catalog</p>
                     <Button 
                       onClick={() => navigate("/client/service-catalog")}
-                      className="mt-3 bg-orange-500 hover:bg-orange-600 text-white"
+                      className="mt-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold px-6 py-2"
                     >
                       Book a Service
                     </Button>
@@ -860,23 +944,27 @@ const ClientDashboard = () => {
             {/* Middle Section: Ongoing Bookings (only show if Action Required section is displayed) */}
             {categorizedBookings.actionRequired.length > 0 && categorizedBookings.ongoing.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
-                  <h3 className="text-lg font-semibold text-gray-800">Ongoing Bookings</h3>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-2 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-lg"></div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+                    <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                      Ongoing Bookings
+                    </span>
+                  </h3>
                 </div>
                 
                 <div className="space-y-4">
                   {categorizedBookings.ongoing.map(booking => (
                     <div key={booking._id} 
-                      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                      className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-blue-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
                     >
-                      <div className="p-6">
+                      <div className="p-6 sm:p-8">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                              <h4 className="font-semibold text-gray-900">{booking.serviceCategory || 'Service'}</h4>
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
+                            <div className="flex flex-wrap items-center gap-3 mb-3">
+                              <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-lg"></div>
+                              <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceCategory || 'Service'}</h4>
+                              <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
                                 {getStatusDisplayText(booking.status)}
                               </span>
                             </div>
@@ -919,14 +1007,14 @@ const ClientDashboard = () => {
                                   e.stopPropagation();
                                   handleChat(booking);
                                 }} 
-                                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                               >
                                 <MessageSquare className="mr-1" size={16} /> Chat
                               </Button>
                             )}
                             <Button
                               variant="outline"
-                              className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                              className="px-6 py-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                               onClick={() => handleBookingClick(booking)}
                             >
                               View Details
@@ -943,23 +1031,27 @@ const ClientDashboard = () => {
             {/* Bottom Section: Recent Bookings (Completed) */}
             {categorizedBookings.recent.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-2 h-8 bg-green-500 rounded-full"></div>
-                  <h3 className="text-lg font-semibold text-gray-800">Recent Bookings</h3>
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-2 h-10 bg-gradient-to-b from-green-500 to-green-600 rounded-full shadow-lg"></div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+                    <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                      Recent Bookings
+                    </span>
+                  </h3>
                 </div>
                 
                 <div className="space-y-4">
                   {categorizedBookings.recent.map(booking => (
                     <div key={booking._id} 
-                      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                      className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-green-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
                     >
-                      <div className="p-6">
+                      <div className="p-6 sm:p-8">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                              <h4 className="font-semibold text-gray-900">{booking.serviceCategory || 'Service'}</h4>
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
+                            <div className="flex flex-wrap items-center gap-3 mb-3">
+                              <div className="w-4 h-4 bg-gradient-to-br from-green-500 to-green-600 rounded-full shadow-lg"></div>
+                              <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceCategory || 'Service'}</h4>
+                              <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
                                 {getStatusDisplayText(booking.status)}
                               </span>
                             </div>
@@ -995,7 +1087,7 @@ const ClientDashboard = () => {
                           </div>
                           <Button
                             variant="outline"
-                            className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                            className="px-6 py-2 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                             onClick={() => handleBookingClick(booking)}
                           >
                             View Details
@@ -1009,6 +1101,7 @@ const ClientDashboard = () => {
             )}
           </div>
         )}
+        </div>
       </div>
       
       
@@ -1020,7 +1113,8 @@ const ClientDashboard = () => {
           onStatusChange={handleBookingStatusChange}
         />
       )}
-    </ClientDashboardLayout>;
+    </ClientDashboardLayout>
+  );
 };
 
 export default ClientDashboard;

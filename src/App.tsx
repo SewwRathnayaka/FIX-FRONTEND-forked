@@ -12,8 +12,6 @@ import ClientSignUp from "./pages/ClientSignUp";
 import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientProfile from "./pages/client/ClientProfile";
 import ClientServiceHistory from "./pages/client/ClientServiceHistory";
-import ClientUpcomingBookings from "./pages/client/ClientUpcomingBookings";
-import ClientReviews from "./pages/client/ClientReviews";
 import ClientPaymentBilling from "./pages/client/ClientPaymentBilling";
 import ClientPayment from "./pages/client/ClientPayment";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
@@ -21,14 +19,12 @@ import { PaymentCancel } from "./pages/PaymentCancel";
 import ClientAccountSettings from "./pages/client/ClientAccountSettings";
 import HandymanDashboard from "./pages/handyman/HandymanDashboard";
 import HandymanSchedule from "./pages/handyman/HandymanSchedule";
-import HandymanJobs from "./pages/handyman/HandymanJobs";
-import HandymanClients from "./pages/handyman/HandymanClients";
 import HandymanSettings from "./pages/handyman/HandymanSettings";
 import HandymanProfile from "./pages/handyman/HandymanProfile";
 import HandymanNotifications from "./pages/handyman/HandymanNotifications";
 import HandymanAccount from "./pages/handyman/HandymanAccount";
-import HandymanBilling from "./pages/handyman/HandymanBilling";
 import HandymanServiceHistory from "./pages/handyman/HandymanServiceHistory";
+import HandymanPayments from "./pages/handyman/HandymanPayments";
 import CompleteProfile from "./pages/CompleteProfile";
 import ServiceDetails from "./pages/client/ServiceDetails";
 import SelectProfessional from "./pages/client/SelectProfessional";
@@ -60,8 +56,6 @@ const App = () => (
           <Route path="/client/service-details" element={<ProtectedClientRoute><ServiceDetails /></ProtectedClientRoute>} />
           <Route path="/client/profile" element={<ProtectedClientRoute><ClientProfile /></ProtectedClientRoute>} />
           <Route path="/client/service-history" element={<ProtectedClientRoute><ClientServiceHistory /></ProtectedClientRoute>} />
-          <Route path="/client/upcoming-bookings" element={<ProtectedClientRoute><ClientUpcomingBookings /></ProtectedClientRoute>} />
-          <Route path="/client/reviews" element={<ProtectedClientRoute><ClientReviews /></ProtectedClientRoute>} />
           <Route path="/client/payment-billing" element={<ProtectedClientRoute><ClientPaymentBilling /></ProtectedClientRoute>} />
           <Route path="/client/payment/success" element={<PaymentSuccess />} />
           <Route path="/client/payment/cancel" element={<PaymentCancel />} />
@@ -72,13 +66,11 @@ const App = () => (
           <Route path="/client/create-booking" element={<ProtectedClientRoute><CreateBooking /></ProtectedClientRoute>} />
           <Route path="/handyman/dashboard" element={<ProtectedHandymanRoute><HandymanDashboard /></ProtectedHandymanRoute>} />
           <Route path="/handyman/schedule" element={<ProtectedHandymanRoute><HandymanSchedule /></ProtectedHandymanRoute>} />
-          <Route path="/handyman/jobs" element={<ProtectedHandymanRoute><HandymanJobs /></ProtectedHandymanRoute>} />
-          <Route path="/handyman/clients" element={<ProtectedHandymanRoute><HandymanClients /></ProtectedHandymanRoute>} />
           <Route path="/handyman/settings" element={<ProtectedHandymanRoute><HandymanSettings /></ProtectedHandymanRoute>} />
           <Route path="/handyman/profile" element={<ProtectedHandymanRoute><HandymanProfile /></ProtectedHandymanRoute>} />
           <Route path="/handyman/notifications" element={<ProtectedHandymanRoute><HandymanNotifications /></ProtectedHandymanRoute>} />
           <Route path="/handyman/account" element={<ProtectedHandymanRoute><HandymanAccount /></ProtectedHandymanRoute>} />
-          <Route path="/handyman/billing" element={<ProtectedHandymanRoute><HandymanBilling /></ProtectedHandymanRoute>} />
+          <Route path="/handyman/payments" element={<ProtectedHandymanRoute><HandymanPayments /></ProtectedHandymanRoute>} />
           <Route path="/handyman/service-history" element={<ProtectedHandymanRoute><HandymanServiceHistory /></ProtectedHandymanRoute>} />
           <Route path="/client/select-professional" element={<ProtectedClientRoute><SelectProfessional /></ProtectedClientRoute>} />
           <Route path="/handyman/registration" element={<HandymanRegistration />} />

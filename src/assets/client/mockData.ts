@@ -1,7 +1,7 @@
 
 export const clientMockData = {
   user: {
-    name: "Sarah Johnson",
+    name: "Samanthi Fonseka",
     email: "sarah.johnson@example.com",
     phone: "(512) 123-4567",
     addresses: [

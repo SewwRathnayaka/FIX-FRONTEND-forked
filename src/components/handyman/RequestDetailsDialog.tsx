@@ -345,10 +345,10 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="pb-4 border-b border-gray-100">
-          <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-2 border-gray-200">
+        <DialogHeader className="pb-4 border-b-2 border-gray-200 bg-gradient-to-r from-green-50 to-orange-50 -m-6 mb-0 p-6 rounded-t-3xl">
+          <DialogTitle className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-3">
+            <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg"></div>
             Request Details
           </DialogTitle>
         </DialogHeader>
@@ -357,7 +357,9 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
           {/* Request Details Content */}
           <>
               {/* Service Information */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100">
+          <div className="bg-gradient-to-br from-green-50 via-orange-50 to-green-50 p-6 rounded-2xl border-2 border-green-200 shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+            <div className="relative z-10">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{request.serviceName}</h3>
@@ -422,6 +424,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
                 </div>
               )}
             </div>
+            </div>
           </div>
 
           {/* Status Progress Bar */}
@@ -432,7 +435,9 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
 
           {/* Fee Input Section - Only show for pending bookings */}
           {request.status === 'pending' && (
-            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-6 rounded-2xl border border-orange-100">
+            <div className="bg-gradient-to-br from-orange-50 via-yellow-50 to-orange-50 p-6 rounded-2xl border-2 border-orange-200 shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-200/20 rounded-full blur-2xl" />
+              <div className="relative z-10">
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-orange-500" />
                 Set Service Fee
@@ -451,21 +456,22 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
                     className="mt-2 border-2 border-orange-200 focus:border-orange-500 focus:ring-orange-500"
                   />
                 </div>
-                <p className="text-xs text-orange-600">
+                <p className="text-xs text-orange-700 font-medium">
                   💡 Set a fair price for your service. The client will review and confirm this amount.
                 </p>
+              </div>
               </div>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-gray-200">
             {/* For pending bookings - show accept/reject buttons */}
             {request.status === 'pending' && (
               <>
                 <Button
                   variant="outline"
-                  className="flex-1 border-2 border-red-200 text-red-700 hover:bg-red-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+                  className="flex-1 border-2 border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                   onClick={handleReject}
                   disabled={isProcessing}
                 >
@@ -484,7 +490,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
 
                 <Button
                   variant="outline"
-                  className="flex-1 border-2 border-blue-200 text-blue-700 hover:bg-blue-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+                  className="flex-1 border-2 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                   onClick={() => {
                     onOpenChange(false);
                     navigate(`/handyman/chat/${request._id}`);
@@ -495,7 +501,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
                 </Button>
 
                 <Button
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   onClick={handleAccept}
                   disabled={isProcessing || !fee || parseFloat(fee) <= 0}
                 >
@@ -519,7 +525,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
               <>
                 <Button
                   variant="outline"
-                  className="flex-1 border-2 border-blue-200 text-blue-700 hover:bg-blue-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+                  className="flex-1 border-2 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                   onClick={() => {
                     onOpenChange(false);
                     navigate(`/handyman/chat/${request._id}`);
@@ -530,7 +536,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
                 </Button>
 
                 <Button
-                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-3 px-6 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   onClick={async () => {
                     try {
                       const response = await BookingsAPI.updateBookingStatusPublic(
@@ -579,7 +585,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
               <div className="flex justify-center w-full">
                 <Button
                   variant="outline"
-                  className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+                  className="border-2 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
                   onClick={() => {
                     onOpenChange(false);
                     navigate(`/handyman/chat/${request._id}`);
@@ -594,7 +600,7 @@ const RequestDetailsDialog = ({ open, onOpenChange, request, onStatusChange }: R
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-2 border-gray-200 text-gray-700 hover:bg-gray-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+              className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               Close
             </Button>

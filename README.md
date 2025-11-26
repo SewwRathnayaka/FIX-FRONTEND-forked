@@ -33,8 +33,10 @@ This is the frontend for the FIX platform, a handyman service application. It is
    - Add the following variables (adjust as needed):
      ```env
      VITE_API_BASE_URL=http://localhost:3001/api
-     VITE_API_TIMEOUT=10000
+     VITE_API_TIMEOUT=30000
      ```
+     
+     **Note**: For production deployments on Render free tier, set `VITE_API_TIMEOUT=60000` (60 seconds) to handle cold starts.
 
 4. **Run the development server:**
    ```sh

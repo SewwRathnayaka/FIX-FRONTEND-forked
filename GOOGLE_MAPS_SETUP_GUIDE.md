@@ -53,20 +53,25 @@ For each API:
 1. Click **"EDIT API KEY"** (pencil icon) next to your new key
 2. Under **"Application restrictions"**:
    - Select **"HTTP referrers (web sites)"**
-   - Click **"ADD AN ITEM"**
-   - Add these referrers:
+   - Click **"ADD AN ITEM"** for each referrer
+   - Add these referrers (IMPORTANT: Add your production domain!):
      ```
+     https://fix-frontend.netlify.app/*
+     https://fix-frontend.netlify.app
      http://localhost:*
      https://localhost:*
-     https://your-domain.com/*
+     http://localhost:5173/*
+     http://localhost:8080/*
      ```
+   - **⚠️ CRITICAL**: If you don't add your production domain (`https://fix-frontend.netlify.app/*`), you'll get `PERMISSION_DENIED` errors in production!
 3. Under **"API restrictions"**:
    - Select **"Restrict key"**
-   - Check:
-     - Maps JavaScript API
-     - Places API
-     - Geocoding API
+   - Check (ALL REQUIRED for Places search to work):
+     - ✅ **Maps JavaScript API** (required)
+     - ✅ **Places API** (required - this is what enables `searchByText`)
+     - ✅ **Geocoding API** (optional but recommended)
 4. Click **"SAVE"**
+   - **Note**: Changes take 1-5 minutes to propagate
 
 ### 1.5 Enable Billing (Required)
 

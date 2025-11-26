@@ -8,6 +8,16 @@
     "label": "Language",
     "menuTitle": "Change language"
   },
+  "navbar": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "contact": "Contact Us",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "dashboard": "Dashboard",
+    "serviceDashboard": "Service Dashboard"
+  },
   "common": {
     "loading": "Loading..."
   },
@@ -42,6 +52,54 @@
       "profileTipMessage": "Complete profiles get faster service and better handyman matching!",
       "completeProfile": "Complete Profile"
     },
+    "serviceCatalog": {
+      "title": "Service Catalog",
+      "subtitle": "Browse and book your desired service",
+      "back": "Back",
+      "searchPlaceholder": "Search Services",
+      "loadingServices": "Loading services...",
+      "failedToLoad": "Failed to load services",
+      "failedHint": "Please check your connection and try again",
+      "tryAgain": "Try Again",
+      "noServicesFound": "No services found matching your search.",
+      "noServicesAvailable": "No services available."
+    },
+    "serviceDetails": {
+      "title": "Service Details",
+      "backToCatalog": "Back to Service Catalog",
+      "noServiceSelected": "No service selected. Please return to the service catalog.",
+      "services": "Services",
+      "duration": "1-3 hours",
+      "startingFrom": "Starting from",
+      "aboutThisService": "About this service",
+      "whatsIncluded": "What's included",
+      "serviceFee": "Service fee",
+      "additionalChargesNote": "Additional charges may apply based on complexity",
+      "bookNow": "Book Now",
+      "defaultDescription": "Professional service with experienced handymen. Our certified professionals are equipped to handle your needs quickly and efficiently, ensuring minimum disruption to your daily life.",
+      "features": {
+        "professionalService": {
+          "title": "Professional Service",
+          "description": "Experienced and certified professionals"
+        },
+        "qualityWork": {
+          "title": "Quality Work",
+          "description": "Guaranteed quality workmanship"
+        },
+        "timelyService": {
+          "title": "Timely Service",
+          "description": "Quick response and efficient completion"
+        },
+        "customerSatisfaction": {
+          "title": "Customer Satisfaction",
+          "description": "Dedicated to customer satisfaction"
+        },
+        "reliableService": {
+          "title": "Reliable Service",
+          "description": "Trusted and reliable service providers"
+        }
+      }
+    },
     "layout": {
       "registerHandyman": "Register as Handyman",
       "serviceDashboard": "Service Dashboard",
@@ -49,7 +107,7 @@
       "noNotifications": "No notifications",
       "menu": {
         "dashboard": "Dashboard",
-        "basicInfo": "Basic Info",
+        "basicInfo": "Profile Info",
         "serviceHistory": "Service History",
         "upcomingBookings": "Upcoming Bookings",
         "reviews": "Reviews Given",
@@ -69,15 +127,254 @@
         "jobs": "Jobs",
         "clients": "Clients",
         "serviceHistory": "Service History",
+        "payments": "Payments",
         "settings": "Settings",
         "profile": "Profile",
         "account": "Account",
         "billing": "Billing"
-      }
+      },
+      "noNotifications": "No notifications"
     },
     "hero": {
       "welcome": "Welcome, {{name}}! 👋",
       "subtitle": "Ready to tackle today's jobs? Check your client requests and manage your schedule."
+    }
+  },
+  "homepage": {
+    "hero": {
+      "title": "#1\nHANDYMAN SERVICE\nWEBSITE",
+      "subtitle": "Connect with reliable and skilled handymen in your area for all your home repair and maintenance needs. Our platform makes it easy to find the right professional for any job.",
+      "bookService": "Book a Service",
+      "joinAsHandyman": "Join as Handyman",
+      "tagline": "Connecting You to Reliable Handyman Services — Anytime, Anywhere!"
+    },
+    "values": {
+      "title": "OUR CORE VALUES",
+      "qualityAssurance": {
+        "title": "Quality Assurance",
+        "description": "All our handymen are vetted and qualified to ensure top-notch service quality for every job."
+      },
+      "customerSatisfaction": {
+        "title": "Customer Satisfaction",
+        "description": "Your satisfaction is our top priority. We ensure every service meets your expectations."
+      },
+      "onTimeService": {
+        "title": "On-Time Service",
+        "description": "We value your time and ensure our handymen arrive on schedule for every appointment."
+      }
+    },
+    "services": {
+      "title": "MOST POPULAR SERVICES",
+      "subtitle": "From carpentry to electrical repairs, we've got you covered for all your home maintenance needs.",
+      "viewAll": "View All Services",
+      "carpentry": {
+        "title": "Carpentry",
+        "description": "Expert carpentry services for furniture assembly, repairs, custom builds, and more."
+      },
+      "plumbing": {
+        "title": "Plumbing",
+        "description": "Professional plumbing solutions for leaks, installations, repairs, and maintenance."
+      },
+      "electrical": {
+        "title": "Electrical",
+        "description": "Skilled electricians for installations, repairs, wiring, and electrical troubleshooting."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "chooseService": {
+        "title": "Choose Service",
+        "description": "Browse through our service categories and select what you need assistance with."
+      },
+      "chooseProvider": {
+        "title": "Choose Service Provider",
+        "description": "Select a skilled handyman from our network of verified professionals."
+      },
+      "createBooking": {
+        "title": "Create Booking",
+        "description": "Fill in all the work details including location, date, time, and specific requirements."
+      },
+      "handymanConfirms": {
+        "title": "Handyman Confirms",
+        "description": "The handyman reviews your booking and confirms it with a service fee."
+      },
+      "customerPays": {
+        "title": "Pay & Confirm",
+        "description": "Review the fee and if satisfied, make secure payment to confirm the booking."
+      },
+      "handymanCompletes": {
+        "title": "Work Completion",
+        "description": "The handyman arrives at your location and completes the service work."
+      },
+      "customerReviews": {
+        "title": "Confirm & Review",
+        "description": "Confirm the job completion and leave a review to help others make informed decisions."
+      }
+    },
+    "testimonials": {
+      "title": "Customer Testimonials",
+      "testimonial1": {
+        "quote": "FixFinder connected me with an amazing handyman who fixed my leaking faucet quickly and professionally. Highly recommend!",
+        "name": "Samanthi Fonseka",
+        "occupation": "Homeowner"
+      },
+      "testimonial2": {
+        "quote": "The platform is easy to use and helped me find reliable help for a home renovation. The handyman was punctual and exceeded my expectations.",
+        "name": "Malith Perera",
+        "occupation": "Apartment Renter"
+      },
+      "testimonial3": {
+        "quote": "I love how secure and simple FixFinder makes payments. The handyman was great and I'll definitely be using this service again!",
+        "name": "Anne Samarakoon",
+        "occupation": "Small Business Owner"
+      }
+    }
+  },
+  "footer": {
+    "description": "Connecting you to reliable handyman services for all your home maintenance and repair needs.",
+    "quickLinks": "Quick Links",
+    "services": "Services",
+    "subscribe": "Subscribe",
+    "subscribeDescription": "Subscribe to our newsletter for tips, updates and special offers.",
+    "emailPlaceholder": "Your email address",
+    "subscribeButton": "Subscribe",
+    "copyright": "© {{year}} FixFinder. All rights reserved."
+  },
+  "about": {
+    "hero": {
+      "title": "About FixFinder",
+      "subtitle": "Your trusted platform for connecting with skilled handymen for all your home maintenance needs"
+    },
+    "whoWeAre": {
+      "title": "Who We Are",
+      "paragraph1": "FixFinder was founded with a simple mission: to connect homeowners and businesses with reliable, skilled handymen who can tackle any home maintenance or repair project efficiently and affordably.",
+      "paragraph2": "Our platform makes it easy to find, book, and pay for handyman services, eliminating the hassle of searching for trusted professionals when you need help around your home or office.",
+      "paragraph3": "We carefully vet all handymen on our platform to ensure they have the skills, experience, and professionalism to deliver high-quality services that meet our standards and exceed your expectations."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "forCustomers": {
+        "title": "For Customers",
+        "description": "We aim to provide a hassle-free experience for finding reliable handymen, ensuring your home maintenance and repair needs are met with quality service, fair pricing, and professional conduct."
+      },
+      "forHandymen": {
+        "title": "For Handymen",
+        "description": "We strive to create opportunities for skilled tradespeople to connect with clients in their area, grow their business, and showcase their expertise through a trusted platform that values their skills."
+      },
+      "forCommunities": {
+        "title": "For Communities",
+        "description": "We work to strengthen local economies by facilitating connections between community members and local service providers, keeping skills and resources within neighborhoods."
+      }
+    },
+    "cta": {
+      "title": "Ready to Experience FixFinder?",
+      "browseServices": "Browse Services",
+      "joinFixFinder": "Join FixFinder"
+    }
+  },
+  "services": {
+    "hero": {
+      "title": "EXPLORE OUR WIDE RANGE OF SERVICES",
+      "subtitle": "Whatever your home maintenance or repair needs, our team of skilled handymen are ready to help"
+    },
+    "serviceList": {
+      "applianceRepair": {
+        "name": "Appliance Repair",
+        "description": "Professional repair services for all household appliances including refrigerators, washing machines, dryers, and more."
+      },
+      "carpentry": {
+        "name": "Carpentry",
+        "description": "Expert woodworking and carpentry services for furniture repair, custom installations, and home improvements."
+      },
+      "cleaning": {
+        "name": "Cleaning",
+        "description": "Comprehensive cleaning services for homes and offices including deep cleaning, regular maintenance, and post-construction cleanup."
+      },
+      "electrical": {
+        "name": "Electrical",
+        "description": "Licensed electrical services for installations, repairs, maintenance, and safety inspections."
+      },
+      "gardening": {
+        "name": "Gardening",
+        "description": "Professional gardening and landscaping services including lawn care, tree trimming, and garden design."
+      },
+      "homeRepair": {
+        "name": "Home Repair",
+        "description": "General home repair and maintenance services for all types of household issues and improvements."
+      },
+      "painting": {
+        "name": "Painting",
+        "description": "Professional painting services for interior and exterior projects with quality materials and expert finishes."
+      },
+      "plumbing": {
+        "name": "Plumbing",
+        "description": "Expert plumbing services for repairs, installations, maintenance, and emergency plumbing issues."
+      },
+      "roofing": {
+        "name": "Roofing",
+        "description": "Professional roofing services including repairs, installations, maintenance, and inspections."
+      },
+      "windowCleaning": {
+        "name": "Window Cleaning",
+        "description": "Professional window cleaning services for residential and commercial properties."
+      },
+      "pestControl": {
+        "name": "Pest Control",
+        "description": "Comprehensive pest control services for residential and commercial properties."
+      },
+      "landscaping": {
+        "name": "Landscaping",
+        "description": "Professional landscaping and outdoor design services including garden design, lawn installation, and landscape maintenance."
+      },
+      "security": {
+        "name": "Security",
+        "description": "Security installation and maintenance services including alarm systems, locks, and security cameras."
+      },
+      "hvac": {
+        "name": "HVAC",
+        "description": "Professional heating, ventilation, and air conditioning services including installation, repair, and maintenance."
+      },
+      "renovation": {
+        "name": "Renovation",
+        "description": "Complete home renovation and remodeling services for interior and exterior improvements."
+      }
+    },
+    "cta": {
+      "title": "Need a Custom Service?",
+      "description": "Don't see what you're looking for? We offer many more specialized services and can customize solutions for your specific needs.",
+      "button": "Contact Us for Custom Services"
+    }
+  },
+  "contact": {
+    "hero": {
+      "title": "Contact Us",
+      "subtitle": "Have questions or need assistance? We're here to help you with any inquiries about our handyman services."
+    },
+    "form": {
+      "title": "Get In Touch",
+      "description": "Fill out the form and our team will get back to you within 24 hours.",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message",
+      "firstNamePlaceholder": "Your first name",
+      "lastNamePlaceholder": "Your last name",
+      "emailPlaceholder": "Your email address",
+      "subjectPlaceholder": "What is this regarding?",
+      "messagePlaceholder": "How can we help you?",
+      "submitButton": "Send Message"
+    },
+    "info": {
+      "title": "Contact Information",
+      "phone": "Phone",
+      "email": "Email",
+      "office": "Office",
+      "workingHours": "Working Hours",
+      "monFri": "Mon-Fri: 8am - 6pm",
+      "mondayFriday": "Monday - Friday: 8am - 6pm",
+      "saturday": "Saturday: 9am - 4pm",
+      "sunday": "Sunday: Closed"
     }
   }
 }
