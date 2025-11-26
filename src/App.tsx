@@ -36,6 +36,9 @@ import HandymanChatRoom from "./pages/handyman/HandymanChatRoom";
 import ProtectedClientRoute from "./components/auth/ProtectedClientRoute";
 import ProtectedHandymanRoute from "./components/auth/ProtectedHandymanRoute";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ProtectedAdminRoute from "./components/auth/ProtectedAdminRoute";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import BookingsByLocation from "./pages/admin/BookingsByLocation";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +79,10 @@ const App = () => (
           <Route path="/handyman/registration" element={<HandymanRegistration />} />
           <Route path="/client/service-catalog" element={<ProtectedClientRoute><ServiceCatalog /></ProtectedClientRoute>} />
           <Route path="/handyman/chat/:bookingId" element={<ProtectedHandymanRoute><HandymanChatRoom /></ProtectedHandymanRoute>} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
+          <Route path="/admin/bookings-location" element={<ProtectedAdminRoute><BookingsByLocation /></ProtectedAdminRoute>} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -477,6 +477,60 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
+export class AdminAPI {
+  /**
+   * Get dashboard statistics
+   * @param userId - Clerk user ID
+   * @param isAdmin - Whether user is admin (from metadata)
+   */
+  static async getDashboardStats(userId: string, isAdmin: boolean) {
+    const response = await api.get('/admin/dashboard/stats', {
+      headers: {
+        'X-User-ID': userId,
+        'X-Admin': String(isAdmin),
+      },
+    });
+    return response.data;
+  }
+
+  /**
+   * Get bookings by location
+   * @param userId - Clerk user ID
+   * @param isAdmin - Whether user is admin (from metadata)
+   */
+  static async getBookingsByLocation(userId: string, isAdmin: boolean) {
+    const response = await api.get('/admin/bookings/location', {
+      headers: {
+        'X-User-ID': userId,
+        'X-Admin': String(isAdmin),
+      },
+    });
+    return response.data;
+  }
+
+  /**
+   * Create a new service (Admin only)
+   * @param userId - Clerk user ID
+   * @param isAdmin - Whether user is admin (from metadata)
+   * @param serviceData - Service data (name, description, baseFee, imageUrl)
+   */
+  static async createService(userId: string, isAdmin: boolean, serviceData: {
+    name: string;
+    description: string;
+    baseFee: number;
+    imageUrl?: string;
+  }) {
+    const response = await api.post('/services', serviceData, {
+      headers: {
+        'X-User-ID': userId,
+        'X-Admin': String(isAdmin),
+        'X-User-Type': 'provider', // Required by auth middleware
+      },
+    });
+    return response.data;
+  }
+}
+
 export class CallAPI {
   /**
    * Get access token for Twilio voice calls

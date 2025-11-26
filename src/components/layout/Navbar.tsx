@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wrench, Menu, X } from "lucide-react";
+import { Wrench, Menu, X, Shield } from "lucide-react";
 import { SignUpButton, SignedOut, SignedIn, UserButton, SignInButton, useUser } from '@clerk/clerk-react';
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 interface NavbarProps {
   showHandymanDashboard?: boolean;
+  showAdminDashboard?: boolean;
 }
 
-const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
+const Navbar = ({ showHandymanDashboard = false, showAdminDashboard = false }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -101,6 +102,17 @@ const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
                 >
                   {t('navbar.serviceDashboard')}
                 </Button>
+              )}
+              {showAdminDashboard && (
+                <Link to="/admin/dashboard">
+                  <Button 
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold px-4 lg:px-5"
+                  >
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
               )}
               <UserButton />
             </SignedIn>
@@ -199,6 +211,16 @@ const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
                       >
                         {t('navbar.serviceDashboard')}
                       </Button>
+                    )}
+                    {showAdminDashboard && (
+                      <Link to="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button 
+                          className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white shadow-lg transition-all duration-300 font-semibold"
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Admin Dashboard
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </SignedIn>

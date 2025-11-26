@@ -3,7 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { Wrench, Droplet, Lightbulb, PaintBucket, HardHat, Home, ArrowRight } from "lucide-react";
+import { Wrench, Droplet, Lightbulb, PaintBucket, HardHat, Home } from "lucide-react";
 import * as React from "react";
 import ServiceDetailDialog from "@/components/services/ServiceDetailDialog";
 import serviceBg from "@/assets/images/service back1.jpg";
@@ -54,11 +54,7 @@ const ServiceCard = ({ name, description, imageUrl, icon }: ServiceCardProps) =>
       </div>
       <div className="p-5 sm:p-6">
         <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-3 group-hover:text-green-600 transition-colors duration-300">{name}</h3>
-        <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">{description}</p>
-        <div className="flex items-center text-green-600 font-semibold text-sm sm:text-base group-hover:text-green-700 transition-colors duration-300">
-          <span>Learn More</span>
-          <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
-        </div>
+        <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{description}</p>
       </div>
     </div>
   );

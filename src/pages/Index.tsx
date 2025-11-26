@@ -16,6 +16,7 @@ const Index = () => {
   const { toast } = useToast();
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [isHandyman, setIsHandyman] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const processedUsersRef = useRef<Set<string>>(new Set());
 
   // Create client record for new users when they land on homepage
@@ -76,9 +77,29 @@ const Index = () => {
     checkHandymanStatus();
   }, [user, isLoaded]);
 
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminStatus = () => {
+      if (!user || !isLoaded) return;
+
+      // Add a small delay to ensure metadata is loaded
+      setTimeout(() => {
+        try {
+          const hasAdminFlag = user.unsafeMetadata?.admin === true || user.publicMetadata?.admin === true;
+          setIsAdmin(hasAdminFlag);
+        } catch (error) {
+          console.error('Failed to check admin status:', error);
+          setIsAdmin(false);
+        }
+      }, 1000); // Wait 1 second for metadata to load
+    };
+
+    checkAdminStatus();
+  }, [user, isLoaded]);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar showHandymanDashboard={isHandyman} />
+      <Navbar showHandymanDashboard={isHandyman} showAdminDashboard={isAdmin} />
       <main className="flex-grow">
         <Hero />
         <Values />
