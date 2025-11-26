@@ -263,23 +263,6 @@ export class NotificationsAPI {
   }
 }
 
-export class GoogleCalendarAPI {
-  static async getAuthUrl() {
-    const response = await api.get('/google-calendar/auth-url');
-    return response.data;
-  }
-
-  static async getConnectionStatus() {
-    const response = await api.get('/google-calendar/status');
-    return response.data;
-  }
-
-  static async disconnect() {
-    const response = await api.delete('/google-calendar/disconnect');
-    return response.data;
-  }
-}
-
 export class HandymanAPI {
   static async registerHandyman(handymanData: any) {
     const response = await api.post('/handyman/register', handymanData);

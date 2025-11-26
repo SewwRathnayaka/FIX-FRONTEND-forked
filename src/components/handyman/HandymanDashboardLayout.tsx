@@ -89,27 +89,27 @@ const HandymanDashboardLayout = ({
           <div className="flex items-center justify-between">
             <div className="flex-1 flex items-center justify-start"></div>
             <div className="flex-1 flex items-center justify-center">
-            <img
-              src="/lovable-uploads/f8b0003c-8de6-4035-b677-59817d3a83cf.png"
-              alt="FixFinder Logo"
+              <img
+                src="/lovable-uploads/f8b0003c-8de6-4035-b677-59817d3a83cf.png"
+                alt="FixFinder Logo"
                 className="h-8 sm:h-10 object-contain"
-              style={{ maxWidth: 140 }}
-            />
+                style={{ maxWidth: 140 }}
+              />
             </div>
             <div className="flex-1 flex items-center justify-end space-x-1 sm:space-x-3">
-            {!isOnDashboard && (
-              <button
+              {!isOnDashboard && (
+                <button
                   className="rounded-full p-1.5 sm:p-2 hover:bg-green-100 transition-all duration-300 hover:scale-110"
-                aria-label="Home"
-                onClick={() => navigate("/handyman/dashboard")}
+                  aria-label="Home"
+                  onClick={() => navigate("/handyman/dashboard")}
                   type="button"
-              >
-                <Home className="h-5 w-5 sm:h-6 sm:w-6 text-green-700" />
-              </button>
-            )}
-            <LanguageSwitcher variant="light" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+                >
+                  <Home className="h-5 w-5 sm:h-6 sm:w-6 text-green-700" />
+                </button>
+              )}
+              <LanguageSwitcher variant="light" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <div className="relative cursor-pointer p-1.5 rounded-full hover:bg-green-100 transition-all duration-300">
                     <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-green-700" />
                     {unreadCount > 0 && (
@@ -144,33 +144,33 @@ const HandymanDashboardLayout = ({
                       <User className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                     )}
                   </div>
-              </DropdownMenuTrigger>
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 sm:w-56 max-w-[calc(100vw-2rem)] bg-white/95 backdrop-blur-md border border-gray-200 shadow-xl rounded-xl">
                   {menuItems.map((item) => {
                     const IconComponent = item.icon || User;
                     return (
-                  <DropdownMenuItem
-                    key={item.labelKey}
-                    onClick={() => navigate(item.route)}
+                      <DropdownMenuItem
+                        key={item.labelKey}
+                        onClick={() => navigate(item.route)}
                         className={`text-sm sm:text-base hover:bg-green-50/50 transition-colors duration-200 ${location.pathname === item.route ? "bg-green-50 text-green-700" : ""}`}
-                  >
+                      >
                         <IconComponent className="h-4 w-4 mr-2" />
-                    <span>{t(item.labelKey)}</span>
-                  </DropdownMenuItem>
+                        <span>{t(item.labelKey)}</span>
+                      </DropdownMenuItem>
                     );
                   })}
                   <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
+                  <DropdownMenuItem
+                    onClick={handleLogout}
                     className="text-red-600 hover:bg-red-50/50 transition-colors duration-200 text-sm sm:text-base font-semibold"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  <span>{t("handyman.layout.logout")}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span>{t("handyman.layout.logout")}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-        </div>
         </div>
       </header>
       
@@ -186,8 +186,8 @@ const HandymanDashboardLayout = ({
           </div>
           {children}
         </main>
-        </div>
-        
+      </div>
+      
       <div className="w-full flex justify-center p-4 sm:p-5 bg-white border-t border-gray-200 shadow-xl">
         <div className="flex items-center">
           <img

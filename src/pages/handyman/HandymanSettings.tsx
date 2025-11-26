@@ -14,11 +14,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Calendar, Globe, Bell, Lock, CalendarCheck, CheckCircle2, XCircle } from "lucide-react";
-import React, { useState, useEffect } from "react";
-import { GoogleCalendarAPI } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
-import { useSearchParams } from "react-router-dom";
+import { Calendar, Globe, Bell, Lock } from "lucide-react";
+import React, { useState } from "react";
 
 const HandymanSettings = () => {
   // Example states (for demonstration; real logic/data/fetching isn't needed per instructions)
@@ -47,88 +44,10 @@ const HandymanSettings = () => {
     publicProfile: false,
   });
 
-  // Google Calendar
-  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
-  const [isLoadingCalendar, setIsLoadingCalendar] = useState(true);
-  const [searchParams] = useSearchParams();
-  const { toast } = useToast();
-
-  // Check calendar connection status on mount
-  useEffect(() => {
-    const checkCalendarStatus = async () => {
-      try {
-        setIsLoadingCalendar(true);
-        const response = await GoogleCalendarAPI.getConnectionStatus();
-        if (response.success) {
-          setIsCalendarConnected(response.data.isConnected);
-        }
-      } catch (error) {
-        console.error('Error checking calendar status:', error);
-      } finally {
-        setIsLoadingCalendar(false);
-      }
-    };
-
-    checkCalendarStatus();
-
-    // Check for callback success/error
-    const calendarStatus = searchParams.get('calendar');
-    if (calendarStatus === 'connected') {
-      toast({
-        title: "Google Calendar Connected",
-        description: "Your Google Calendar has been successfully connected. Bookings will now be automatically added to your calendar.",
-      });
-      setIsCalendarConnected(true);
-      // Remove query param
-      window.history.replaceState({}, '', window.location.pathname);
-    } else if (calendarStatus === 'error') {
-      toast({
-        title: "Connection Failed",
-        description: "Failed to connect Google Calendar. Please try again.",
-        variant: "destructive",
-      });
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [searchParams, toast]);
-
   // Handlers
   const handleEmailChange = (key: string) => setEmailOpts(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev]}));
   const handleSmsChange = (key: string) => setSmsOpts(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev]}));
   const handlePrivacyChange = (key: string) => setPrivacy(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev]}));
-
-  const handleConnectCalendar = async () => {
-    try {
-      const response = await GoogleCalendarAPI.getAuthUrl();
-      if (response.success && response.data.authUrl) {
-        window.location.href = response.data.authUrl;
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to get authorization URL",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDisconnectCalendar = async () => {
-    try {
-      const response = await GoogleCalendarAPI.disconnect();
-      if (response.success) {
-        setIsCalendarConnected(false);
-        toast({
-          title: "Google Calendar Disconnected",
-          description: "Your Google Calendar has been disconnected successfully.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to disconnect Google Calendar",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <HandymanDashboardLayout title="Settings" subtitle="Manage your preferences and account settings">
@@ -355,81 +274,6 @@ const HandymanSettings = () => {
               Save Preferences
             </Button>
           </CardFooter>
-        </Card>
-
-        {/* Google Calendar Integration */}
-        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl" />
-          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
-            <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
-              <CalendarCheck className="h-6 w-6 text-green-600" />
-              Google Calendar Integration
-            </CardTitle>
-            <CardDescription className="text-base font-medium text-gray-700 mt-2">
-              Automatically add paid bookings to your Google Calendar with reminders
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="relative z-10 p-6">
-            {isLoadingCalendar ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-                <span className="ml-3 text-gray-600">Checking connection status...</span>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200">
-                  {isCalendarConnected ? (
-                    <>
-                      <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-800">Google Calendar Connected</p>
-                        <p className="text-sm text-gray-600">Bookings will be automatically added to your calendar when payment is confirmed.</p>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-6 w-6 text-gray-400 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="font-bold text-gray-800">Google Calendar Not Connected</p>
-                        <p className="text-sm text-gray-600">Connect your Google Calendar to automatically add bookings with reminders.</p>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {isCalendarConnected ? (
-                  <Button
-                    onClick={handleDisconnectCalendar}
-                    variant="outline"
-                    className="w-full border-2 border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                  >
-                    <XCircle className="mr-2 h-5 w-5" />
-                    Disconnect Google Calendar
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleConnectCalendar}
-                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                  >
-                    <CalendarCheck className="mr-2 h-5 w-5" />
-                    Connect Google Calendar
-                  </Button>
-                )}
-
-                <div className="mt-4 p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
-                  <p className="text-sm text-blue-800 font-medium">
-                    💡 <strong>How it works:</strong> When a customer pays for a booking, it will automatically be added to your Google Calendar with:
-                  </p>
-                  <ul className="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
-                    <li>Service name and client information</li>
-                    <li>Scheduled date and time</li>
-                    <li>Location address</li>
-                    <li>Reminders: 1 day before (email) and 1 hour before (popup)</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-          </CardContent>
         </Card>
 
         {/* Privacy Settings */}
