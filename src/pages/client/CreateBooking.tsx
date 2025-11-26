@@ -311,22 +311,24 @@ const CreateBooking: React.FC = () => {
     <ClientDashboardLayout title="Create Booking" subtitle="Request service from your selected professional">
       <div className="space-y-6">
         {/* Service and Professional Info */}
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-200/20 rounded-full blur-2xl" />
+          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-orange-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">
                   <Wrench className="h-8 w-8" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{service.name}</h2>
-                  <p className="text-gray-600">Service Category</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{service.name}</h2>
+                  <p className="text-gray-600 text-sm sm:text-base">Service Category</p>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-green-600" />
-                  <span className="font-semibold text-green-700">{professional.name}</span>
+                  <span className="font-semibold text-green-700 text-base sm:text-lg">{professional.name}</span>
                 </div>
                 <p className="text-sm text-gray-600">{professional.title}</p>
                 <div className="flex items-center mt-1">
@@ -341,18 +343,18 @@ const CreateBooking: React.FC = () => {
         </Card>
 
         {/* Booking Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5 text-blue-600" />
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <CardTitle className="flex items-center space-x-2 text-xl sm:text-2xl font-bold text-gray-800">
+              <FileText className="h-6 w-6 text-green-600" />
               <span>Service Request Details</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="p-6 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Job Description */}
               <div>
-                <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="description" className="text-sm font-semibold text-gray-700 mb-2 block">
                   Job Description *
                 </Label>
                 <Textarea
@@ -360,7 +362,7 @@ const CreateBooking: React.FC = () => {
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Describe the job or service you need in detail..."
-                  className="mt-1 min-h-[100px]"
+                  className="mt-1 min-h-[100px] border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg shadow-sm"
                   required
                 />
               </div>
@@ -483,7 +485,7 @@ const CreateBooking: React.FC = () => {
                 <Button
                   type="submit"
                   disabled={!isFormValid()}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-6 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 rounded-full disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   Review & Submit Booking
                 </Button>

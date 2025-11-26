@@ -88,22 +88,35 @@ const StatsCards = () => {
   };
 
   return (
-    <div className="w-full flex flex-col md:flex-row gap-6 mb-8">
-      <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg p-6 shadow flex flex-col items-center">
-          <div className="text-xs text-gray-500 mb-1">Total Earnings</div>
-          <div className="text-xl font-bold">${stats.totalEarnings.toFixed(2)}</div>
-          <div className="text-xs text-gray-400 mt-1">from {stats.transactionCount} transactions</div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-green-200/20 rounded-full blur-2xl" />
+        <div className="relative z-10">
+          <div className="text-sm font-semibold text-gray-500 mb-2">Total Earnings</div>
+          <div className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-1">
+            ${stats.totalEarnings.toFixed(2)}
+          </div>
+          <div className="text-xs text-gray-400">from {stats.transactionCount} transactions</div>
         </div>
-        <div className="bg-white rounded-lg p-6 shadow flex flex-col items-center">
-          <div className="text-xs text-gray-500 mb-1">Jobs Completed</div>
-          <div className="text-xl font-bold">{stats.jobsCompleted}</div>
-          <div className="text-xs text-gray-400 mt-1">completed successfully</div>
+      </div>
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl" />
+        <div className="relative z-10">
+          <div className="text-sm font-semibold text-gray-500 mb-2">Jobs Completed</div>
+          <div className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
+            {stats.jobsCompleted}
+          </div>
+          <div className="text-xs text-gray-400">completed successfully</div>
         </div>
-        <div className="bg-white rounded-lg p-6 shadow flex flex-col items-center">
-          <div className="text-xs text-gray-500 mb-1">Average Rating</div>
-          <div className="text-xl font-bold">4.8</div>
-          <div className="text-xs text-gray-400 mt-1">based on reviews</div>
+      </div>
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-200/20 rounded-full blur-2xl" />
+        <div className="relative z-10">
+          <div className="text-sm font-semibold text-gray-500 mb-2">Average Rating</div>
+          <div className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-1">
+            4.8
+          </div>
+          <div className="text-xs text-gray-400">based on reviews</div>
         </div>
       </div>
     </div>

@@ -221,20 +221,24 @@ const ClientProfile = () => {
     <ClientDashboardLayout title="Profile" subtitle="Manage your account information">
       <div className="space-y-6">
         {/* Profile Header */}
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          {/* Decorative blur elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-200/20 rounded-full blur-2xl" />
+          
+          <CardHeader className="relative z-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-green-500 to-orange-500 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-lg">
                   {clientData.name ? clientData.name.charAt(0).toUpperCase() : clientData.username.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
                     {clientData.name || clientData.username}
                   </h2>
-                  <p className="text-gray-600">@{clientData.username}</p>
+                  <p className="text-gray-600 text-sm sm:text-base">@{clientData.username}</p>
                   <div className="flex items-center space-x-2 mt-2">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                    <Badge variant="secondary" className="bg-gradient-to-r from-green-100 to-orange-100 text-green-800 border-2 border-green-300 font-semibold">
                       {(() => {
                         const currentCompletion = [
                           editData.name ? 1 : 0,
@@ -245,9 +249,9 @@ const ClientProfile = () => {
                       })()}% Complete
                     </Badge>
                     {clientData.rating && (
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1 bg-yellow-100 px-2 py-1 rounded-full">
                         <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                        <span className="text-sm text-gray-600">{clientData.rating}/5</span>
+                        <span className="text-sm text-yellow-800 font-semibold">{clientData.rating}/5</span>
                       </div>
                     )}
                   </div>
@@ -255,17 +259,17 @@ const ClientProfile = () => {
               </div>
               <div className="flex space-x-2">
                 {!isEditing ? (
-                  <Button onClick={handleEdit} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={handleEdit} className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Profile
                   </Button>
                 ) : (
                   <>
-                    <Button onClick={handleCancel} variant="outline">
+                    <Button onClick={handleCancel} variant="outline" className="border-2 border-gray-300 hover:border-gray-400">
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </Button>
-                    <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                    <Button onClick={handleSave} className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                       <Save className="h-4 w-4 mr-2" />
                       Save Changes
                     </Button>

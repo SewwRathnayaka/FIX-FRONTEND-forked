@@ -171,30 +171,36 @@ const ClientPayment: React.FC = () => {
   }
 
   return (
-    <ClientDashboardLayout title="Payment">
-      <div className="max-w-2xl mx-auto">
-        <Button 
-          onClick={() => navigate('/client/dashboard')}
-          variant="outline"
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
-        </Button>
+    <ClientDashboardLayout title="Payment" subtitle="Complete your payment to confirm the booking">
+      <div className="max-w-2xl mx-auto relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-green-100/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-100/20 rounded-full blur-3xl" />
+        
+        <div className="relative z-10">
+          <Button 
+            onClick={() => navigate('/client/dashboard')}
+            variant="outline"
+            className="mb-6 bg-white/80 backdrop-blur-sm border-2 border-gray-300 hover:border-gray-400 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Dashboard
+          </Button>
 
-        <div className="space-y-6">
-          {/* Booking Overview */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">{booking.serviceName}</CardTitle>
-                {getStatusBadge(booking.status)}
-              </div>
-              <CardDescription>
-                Service provided by {booking.providerName}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="space-y-6">
+            {/* Booking Overview */}
+            <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+              <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b-2 border-green-200">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">{booking.serviceName}</CardTitle>
+                  {getStatusBadge(booking.status)}
+                </div>
+                <CardDescription className="text-base font-medium text-gray-700 mt-2">
+                  Service provided by {booking.providerName}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="relative z-10 p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -219,21 +225,22 @@ const ClientPayment: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Payment Section */}
-          {booking.status === 'accepted' && booking.fee && booking.fee > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Payment Details
-                </CardTitle>
-                <CardDescription>
-                  Complete your payment to confirm the booking
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Payment Breakdown */}
-                <div className="bg-white border rounded-lg p-6 space-y-4">
+            {/* Payment Section */}
+            {booking.status === 'accepted' && booking.fee && booking.fee > 0 && (
+              <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/20 rounded-full blur-2xl" />
+                <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b-2 border-green-200">
+                  <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
+                    <CreditCard className="w-6 h-6 text-green-600" />
+                    Payment Details
+                  </CardTitle>
+                  <CardDescription className="text-base font-medium text-gray-700 mt-2">
+                    Complete your payment to confirm the booking
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="relative z-10 p-6 space-y-6">
+                  {/* Payment Breakdown */}
+                  <div className="bg-gradient-to-br from-green-50 to-orange-50 border-2 border-green-200 rounded-xl p-6 space-y-4 shadow-md">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Service Fee</span>
                     <span className="font-semibold">${booking.fee.toFixed(2)}</span>
@@ -260,83 +267,84 @@ const ClientPayment: React.FC = () => {
                   onPaymentError={handlePaymentError}
                 />
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                    <div className="text-sm text-yellow-800">
-                      <p className="font-medium mb-1">Payment Breakdown</p>
-                      <p>
-                        The service fee is ${booking.fee.toFixed(2)}. An additional 20% platform fee (${(booking.fee * 0.2).toFixed(2)}) 
-                        is added to cover processing costs and platform maintenance.
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-4 shadow-md">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm text-yellow-800">
+                          <p className="font-bold mb-1">Payment Breakdown</p>
+                          <p>
+                            The service fee is ${booking.fee.toFixed(2)}. An additional 20% platform fee (${(booking.fee * 0.2).toFixed(2)}) 
+                            is added to cover processing costs and platform maintenance.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* Status Messages */}
+            {booking.status === 'pending' && (
+              <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-4 shadow-md">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-yellow-600" />
+                      <p className="text-sm font-medium text-yellow-800">
+                        Waiting for provider to accept your booking request and set the service fee.
                       </p>
                     </div>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+            )}
 
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Status Messages */}
-          {booking.status === 'pending' && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-yellow-600" />
-                    <p className="text-sm text-yellow-800">
-                      Waiting for provider to accept your booking request and set the service fee.
-                    </p>
+            {booking.status === 'paid' && (
+              <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-4 shadow-md">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-green-600" />
+                      <p className="text-sm font-medium text-green-800">
+                        Payment completed! Your provider has been notified and will proceed with the service.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
 
-          {booking.status === 'paid' && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-green-600" />
-                    <p className="text-sm text-green-800">
-                      Payment completed! Your provider has been notified and will proceed with the service.
-                    </p>
+            {booking.status === 'done' && (
+              <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-4 shadow-md">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                      <p className="text-sm font-medium text-blue-800">
+                        Service completed! Please confirm completion to finalize the transaction.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
 
-          {booking.status === 'done' && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-600" />
-                    <p className="text-sm text-blue-800">
-                      Service completed! Please confirm completion to finalize the transaction.
-                    </p>
+            {booking.status === 'completed' && (
+              <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100">
+                <CardContent className="p-6">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-4 shadow-md">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <p className="text-sm font-medium text-green-800">
+                        Transaction completed! Thank you for using our platform.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {booking.status === 'completed' && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <p className="text-sm text-green-800">
-                      Transaction completed! Thank you for using our platform.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </ClientDashboardLayout>

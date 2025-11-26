@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Wrench, Menu, X } from "lucide-react";
 import { SignUpButton, SignedOut, SignedIn, UserButton, SignInButton, useUser } from '@clerk/clerk-react';
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 
 interface NavbarProps {
   showHandymanDashboard?: boolean;
@@ -10,13 +12,14 @@ interface NavbarProps {
 
 const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
-    <nav className="bg-[#14B22D] shadow-md">
-      <div className="container mx-auto px-4 py-3">
+    <nav className="bg-[#14B22D] shadow-xl backdrop-blur-md border-b border-green-400/20 sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Link to="/" className="flex items-center h-8 sm:h-10" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link to="/" className="flex items-center h-8 sm:h-10 transition-transform duration-300 hover:scale-105" onClick={() => setIsMobileMenuOpen(false)}>
               {/* LOGO IMAGE HOLDER */}
               <img
                 src="/lovable-uploads/a707e924-f315-4907-a798-16e19d2e7a69.png"
@@ -28,48 +31,75 @@ const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-white hover:text-green-100 font-medium">
-              Home
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            <Link 
+              to="/" 
+              className="text-white hover:text-orange-200 font-semibold text-sm lg:text-base transition-all duration-300 relative group px-2 py-1"
+            >
+              {t('navbar.home')}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-300 group-hover:w-full transition-all duration-300" />
             </Link>
-            <Link to="/about" className="text-white hover:text-green-100 font-medium">
-              About Us
+            <Link 
+              to="/about" 
+              className="text-white hover:text-orange-200 font-semibold text-sm lg:text-base transition-all duration-300 relative group px-2 py-1"
+            >
+              {t('navbar.about')}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-300 group-hover:w-full transition-all duration-300" />
             </Link>
-            <Link to="/services" className="text-white hover:text-green-100 font-medium">
-              Services
+            <Link 
+              to="/services" 
+              className="text-white hover:text-orange-200 font-semibold text-sm lg:text-base transition-all duration-300 relative group px-2 py-1"
+            >
+              {t('navbar.services')}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-300 group-hover:w-full transition-all duration-300" />
             </Link>
-            <Link to="/contact" className="text-white hover:text-green-100 font-medium">
-              Contact Us
+            <Link 
+              to="/contact" 
+              className="text-white hover:text-orange-200 font-semibold text-sm lg:text-base transition-all duration-300 relative group px-2 py-1"
+            >
+              {t('navbar.contact')}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-orange-300 group-hover:w-full transition-all duration-300" />
             </Link>
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
+            <LanguageSwitcher variant="dark" />
             <SignedOut>
               <SignInButton mode="modal">
-                <Button variant="outline" size="sm" className="bg-white text-green-600 hover:bg-green-100">
-                  Login
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-white/90 backdrop-blur-sm text-green-600 hover:bg-white hover:text-green-700 border-white/20 shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold px-4 lg:px-5"
+                >
+                  {t('navbar.login')}
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm" className="bg-orange-500 text-white hover:bg-orange-600">
-                  Sign Up
+                <Button 
+                  size="sm" 
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105 font-semibold px-4 lg:px-5"
+                >
+                  {t('navbar.signUp')}
                 </Button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>
               <Link to="/client/dashboard">
-                <Button size="sm" className="bg-green-600 text-white hover:bg-green-700">
-                  Dashboard
+                <Button 
+                  size="sm" 
+                  className="bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 text-white shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold px-4 lg:px-5"
+                >
+                  {t('navbar.dashboard')}
                 </Button>
               </Link>
               {showHandymanDashboard && (
                 <Button 
                   size="sm"
-                  className="bg-blue-600 text-white hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg transition-all duration-300 transform hover:scale-105 font-semibold px-4 lg:px-5"
                   onClick={() => window.open('/handyman/dashboard', '_blank')}
                 >
-                  Service Dashboard
+                  {t('navbar.serviceDashboard')}
                 </Button>
               )}
               <UserButton />
@@ -77,14 +107,19 @@ const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-1 sm:space-x-2">
+            <div className="flex-shrink-0">
+              <LanguageSwitcher variant="dark" />
+            </div>
             <SignedIn>
-              <UserButton />
+              <div className="flex-shrink-0">
+                <UserButton />
+              </div>
             </SignedIn>
             <Button
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-green-600 p-2"
+              className="text-white hover:bg-white/20 backdrop-blur-sm p-2 flex-shrink-0 rounded-lg transition-all duration-300"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -95,47 +130,52 @@ const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
 
         {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-green-400 pt-4">
-            <div className="flex flex-col space-y-4">
+          <div className="md:hidden mt-4 pb-4 border-t border-white/20 pt-4 backdrop-blur-md bg-white/5 rounded-lg">
+            <div className="flex flex-col space-y-3">
               <Link 
                 to="/" 
-                className="text-white hover:text-green-100 font-medium py-2"
+                className="text-white hover:text-orange-200 font-semibold py-2 px-3 rounded-lg hover:bg-white/10 transition-all duration-300"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Home
+                {t('navbar.home')}
               </Link>
               <Link 
                 to="/about" 
-                className="text-white hover:text-green-100 font-medium py-2"
+                className="text-white hover:text-orange-200 font-semibold py-2 px-3 rounded-lg hover:bg-white/10 transition-all duration-300"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                About Us
+                {t('navbar.about')}
               </Link>
               <Link 
                 to="/services" 
-                className="text-white hover:text-green-100 font-medium py-2"
+                className="text-white hover:text-orange-200 font-semibold py-2 px-3 rounded-lg hover:bg-white/10 transition-all duration-300"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Services
+                {t('navbar.services')}
               </Link>
               <Link 
                 to="/contact" 
-                className="text-white hover:text-green-100 font-medium py-2"
+                className="text-white hover:text-orange-200 font-semibold py-2 px-3 rounded-lg hover:bg-white/10 transition-all duration-300"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Contact Us
+                {t('navbar.contact')}
               </Link>
-              <div className="pt-2 border-t border-green-400">
+              <div className="pt-3 border-t border-white/20">
                 <SignedOut>
                   <div className="flex flex-col space-y-2">
                     <SignInButton mode="modal">
-                      <Button variant="outline" className="w-full bg-white text-green-600 hover:bg-green-100">
-                        Login
+                      <Button 
+                        variant="outline" 
+                        className="w-full bg-white/90 backdrop-blur-sm text-green-600 hover:bg-white hover:text-green-700 border-white/20 shadow-lg transition-all duration-300 font-semibold"
+                      >
+                        {t('navbar.login')}
                       </Button>
                     </SignInButton>
                     <SignUpButton mode="modal">
-                      <Button className="w-full bg-orange-500 text-white hover:bg-orange-600">
-                        Sign Up
+                      <Button 
+                        className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg transition-all duration-300 font-semibold"
+                      >
+                        {t('navbar.signUp')}
                       </Button>
                     </SignUpButton>
                   </div>
@@ -143,19 +183,21 @@ const Navbar = ({ showHandymanDashboard = false }: NavbarProps) => {
                 <SignedIn>
                   <div className="flex flex-col space-y-2">
                     <Link to="/client/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button className="w-full bg-green-600 text-white hover:bg-green-700">
-                        Dashboard
+                      <Button 
+                        className="w-full bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 text-white shadow-lg transition-all duration-300 font-semibold"
+                      >
+                        {t('navbar.dashboard')}
                       </Button>
                     </Link>
                     {showHandymanDashboard && (
                       <Button 
-                        className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg transition-all duration-300 font-semibold"
                         onClick={() => {
                           window.open('/handyman/dashboard', '_blank');
                           setIsMobileMenuOpen(false);
                         }}
                       >
-                        Service Dashboard
+                        {t('navbar.serviceDashboard')}
                       </Button>
                     )}
                   </div>

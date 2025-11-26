@@ -155,7 +155,7 @@ const StatusExplanation = ({ status }: { status: string }) => {
   const Icon = info.icon;
 
   return (
-    <div className="mb-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+    <div className="mb-6 p-4 bg-gradient-to-br from-green-50 via-orange-50 to-green-50 rounded-xl border-2 border-green-200 shadow-md">
       <div className="flex items-start gap-3">
         <div className={`p-2 rounded-full bg-white shadow-sm`}>
           <Icon className={`h-5 w-5 ${info.color}`} />
@@ -356,17 +356,19 @@ const BookingPopup = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="pb-4 border-b border-gray-100">
-            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border-2 border-gray-200">
+          <DialogHeader className="pb-4 border-b-2 border-gray-200 bg-gradient-to-r from-green-50 to-orange-50 -m-6 mb-0 p-6 rounded-t-3xl">
+            <DialogTitle className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-3">
+              <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg"></div>
               Booking Details
             </DialogTitle>
           </DialogHeader>
 
           <div className="py-6 space-y-6">
               {/* Service Information */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100">
+          <div className="bg-gradient-to-br from-green-50 via-orange-50 to-green-50 p-6 rounded-2xl border-2 border-green-200 shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+            <div className="relative z-10">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{booking.serviceCategory || 'Service'}</h3>
@@ -431,6 +433,7 @@ const BookingPopup = ({
                 </div>
               )}
             </div>
+            </div>
           </div>
 
           {/* Status Progress Bar */}
@@ -440,12 +443,12 @@ const BookingPopup = ({
           <StatusExplanation status={booking.status} />
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-gray-200">
             {booking.status === 'accepted' && (
               <Button
                 onClick={handleMarkAsPaid}
                 disabled={isProcessing}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 {isProcessing ? (
                   <>
@@ -465,7 +468,7 @@ const BookingPopup = ({
               <Button
                 onClick={handleMarkAsCompleted}
                 disabled={isProcessing}
-                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-3 px-6 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 {isProcessing ? (
                   <>
@@ -485,7 +488,7 @@ const BookingPopup = ({
               <Button
                 variant="outline"
                 onClick={handleChat}
-                className="flex-1 border-2 border-blue-200 text-blue-700 hover:bg-blue-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+                className="flex-1 border-2 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               >
                 <MessageSquare className="mr-2 h-5 w-5" />
                 Chat with Provider
@@ -495,7 +498,7 @@ const BookingPopup = ({
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-2 border-gray-200 text-gray-700 hover:bg-gray-50 py-3 px-6 rounded-xl font-semibold transition-all duration-200"
+              className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
             >
               Close
             </Button>

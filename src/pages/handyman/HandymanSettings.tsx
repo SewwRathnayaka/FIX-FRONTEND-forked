@@ -14,8 +14,11 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Calendar, Globe, Bell, Lock } from "lucide-react";
-import React, { useState } from "react";
+import { Calendar, Globe, Bell, Lock, CalendarCheck, CheckCircle2, XCircle } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { GoogleCalendarAPI } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from "react-router-dom";
 
 const HandymanSettings = () => {
   // Example states (for demonstration; real logic/data/fetching isn't needed per instructions)
@@ -44,21 +47,102 @@ const HandymanSettings = () => {
     publicProfile: false,
   });
 
+  // Google Calendar
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+  const [isLoadingCalendar, setIsLoadingCalendar] = useState(true);
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
+
+  // Check calendar connection status on mount
+  useEffect(() => {
+    const checkCalendarStatus = async () => {
+      try {
+        setIsLoadingCalendar(true);
+        const response = await GoogleCalendarAPI.getConnectionStatus();
+        if (response.success) {
+          setIsCalendarConnected(response.data.isConnected);
+        }
+      } catch (error) {
+        console.error('Error checking calendar status:', error);
+      } finally {
+        setIsLoadingCalendar(false);
+      }
+    };
+
+    checkCalendarStatus();
+
+    // Check for callback success/error
+    const calendarStatus = searchParams.get('calendar');
+    if (calendarStatus === 'connected') {
+      toast({
+        title: "Google Calendar Connected",
+        description: "Your Google Calendar has been successfully connected. Bookings will now be automatically added to your calendar.",
+      });
+      setIsCalendarConnected(true);
+      // Remove query param
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (calendarStatus === 'error') {
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect Google Calendar. Please try again.",
+        variant: "destructive",
+      });
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [searchParams, toast]);
+
   // Handlers
   const handleEmailChange = (key: string) => setEmailOpts(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev]}));
   const handleSmsChange = (key: string) => setSmsOpts(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev]}));
   const handlePrivacyChange = (key: string) => setPrivacy(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev]}));
 
+  const handleConnectCalendar = async () => {
+    try {
+      const response = await GoogleCalendarAPI.getAuthUrl();
+      if (response.success && response.data.authUrl) {
+        window.location.href = response.data.authUrl;
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to get authorization URL",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDisconnectCalendar = async () => {
+    try {
+      const response = await GoogleCalendarAPI.disconnect();
+      if (response.success) {
+        setIsCalendarConnected(false);
+        toast({
+          title: "Google Calendar Disconnected",
+          description: "Your Google Calendar has been disconnected successfully.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to disconnect Google Calendar",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <HandymanDashboardLayout title="Settings">
-      <div className="flex flex-col gap-8 pb-8">
+    <HandymanDashboardLayout title="Settings" subtitle="Manage your preferences and account settings">
+      <div className="flex flex-col gap-6 pb-8">
         {/* General Settings */}
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Calendar className="text-green-600" size={22} />
-            <CardTitle className="text-base font-semibold">General Settings</CardTitle>
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
+              <Calendar className="h-6 w-6 text-green-600" />
+              General Settings
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10 p-6">
             <div className="flex flex-col md:flex-row gap-5 md:gap-8 mb-5">
               <div className="flex-1 flex flex-col gap-2">
                 <Label htmlFor="calendar-view" className="font-medium">Default Calendar View</Label>
@@ -128,20 +212,26 @@ const HandymanSettings = () => {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="justify-end pt-2">
-            <Button className="bg-[#14B22D] hover:bg-[#13a428] px-6" type="button">
+          <CardFooter className="justify-end pt-4">
+            <Button 
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold" 
+              type="button"
+            >
               Save Changes
             </Button>
           </CardFooter>
         </Card>
 
         {/* Regional Settings */}
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Globe className="text-green-600" size={22} />
-            <CardTitle className="text-base font-semibold">Regional Settings</CardTitle>
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl" />
+          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
+              <Globe className="h-6 w-6 text-green-600" />
+              Regional Settings
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10 p-6">
             <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-5 mb-5">
               {/* Language */}
               <div className="flex flex-col gap-2">
@@ -200,85 +290,175 @@ const HandymanSettings = () => {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="justify-end pt-2">
-            <Button className="bg-[#14B22D] hover:bg-[#13a428] px-6" type="button">
+          <CardFooter className="justify-end pt-4">
+            <Button 
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold" 
+              type="button"
+            >
               Save Changes
             </Button>
           </CardFooter>
         </Card>
 
         {/* Notification Preferences */}
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Bell className="text-green-600" size={22} />
-            <CardTitle className="text-base font-semibold">Notification Preferences</CardTitle>
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/20 rounded-full blur-2xl" />
+          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
+              <Bell className="h-6 w-6 text-green-600" />
+              Notification Preferences
+            </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10 p-6">
             {/* Email Notifications */}
-            <div className="mb-4">
-              <div className="font-semibold text-green-900 text-sm mb-2">Email Notifications</div>
-              <div className="flex flex-col gap-2 pl-2">
-                <label className="flex items-center gap-2 text-green-800">
+            <div className="mb-6">
+              <div className="font-bold text-gray-800 text-base mb-4">Email Notifications</div>
+              <div className="flex flex-col gap-3 pl-2">
+                <label className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                   <Checkbox checked={emailOpts.newJob} onCheckedChange={() => handleEmailChange("newJob")} />
-                  <span className="text-green-800 text-base font-medium">New job requests</span>
+                  <span className="text-gray-800 text-base font-semibold">New job requests</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                   <Checkbox checked={emailOpts.jobReminders} onCheckedChange={() => handleEmailChange("jobReminders")} />
-                  <span className="text-gray-700 text-base font-normal">Job reminders (24h before)</span>
+                  <span className="text-gray-700 text-base font-medium">Job reminders (24h before)</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                   <Checkbox checked={emailOpts.payment} onCheckedChange={() => handleEmailChange("payment")} />
-                  <span className="text-gray-700 text-base font-normal">Payment received</span>
+                  <span className="text-gray-700 text-base font-medium">Payment received</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                   <Checkbox checked={emailOpts.marketing} onCheckedChange={() => handleEmailChange("marketing")} />
-                  <span className="text-gray-700 text-base font-normal">Marketing updates</span>
+                  <span className="text-gray-700 text-base font-medium">Marketing updates</span>
                 </label>
               </div>
             </div>
             {/* SMS Notifications */}
             <div>
-              <div className="font-semibold text-green-900 text-sm mb-2">SMS Notifications</div>
-              <div className="flex flex-col gap-2 pl-2">
-                <label className="flex items-center gap-2">
+              <div className="font-bold text-gray-800 text-base mb-4">SMS Notifications</div>
+              <div className="flex flex-col gap-3 pl-2">
+                <label className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                   <Checkbox checked={smsOpts.jobReminders} onCheckedChange={() => handleSmsChange("jobReminders")} />
-                  <span className="text-gray-700 text-base font-normal">Job reminders (2h before)</span>
+                  <span className="text-gray-700 text-base font-medium">Job reminders (2h before)</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                   <Checkbox checked={smsOpts.newJob} onCheckedChange={() => handleSmsChange("newJob")} />
-                  <span className="text-gray-700 text-base font-normal">New job requests</span>
+                  <span className="text-gray-700 text-base font-medium">New job requests</span>
                 </label>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="justify-end pt-2">
-            <Button className="bg-[#14B22D] hover:bg-[#13a428] px-6" type="button">
+          <CardFooter className="justify-end pt-4">
+            <Button 
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold" 
+              type="button"
+            >
               Save Preferences
             </Button>
           </CardFooter>
         </Card>
 
-        {/* Privacy Settings */}
-        <Card>
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
-            <Lock className="text-green-600" size={22} />
-            <CardTitle className="text-base font-semibold">Privacy Settings</CardTitle>
+        {/* Google Calendar Integration */}
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-200/20 rounded-full blur-2xl" />
+          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
+              <CalendarCheck className="h-6 w-6 text-green-600" />
+              Google Calendar Integration
+            </CardTitle>
+            <CardDescription className="text-base font-medium text-gray-700 mt-2">
+              Automatically add paid bookings to your Google Calendar with reminders
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-2">
-              <div className="font-semibold text-green-900 text-sm mb-1">Data Sharing</div>
-              <label className="flex items-center gap-2">
+          <CardContent className="relative z-10 p-6">
+            {isLoadingCalendar ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <span className="ml-3 text-gray-600">Checking connection status...</span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200">
+                  {isCalendarConnected ? (
+                    <>
+                      <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-800">Google Calendar Connected</p>
+                        <p className="text-sm text-gray-600">Bookings will be automatically added to your calendar when payment is confirmed.</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-6 w-6 text-gray-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-800">Google Calendar Not Connected</p>
+                        <p className="text-sm text-gray-600">Connect your Google Calendar to automatically add bookings with reminders.</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {isCalendarConnected ? (
+                  <Button
+                    onClick={handleDisconnectCalendar}
+                    variant="outline"
+                    className="w-full border-2 border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400 py-3 px-6 rounded-full font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    <XCircle className="mr-2 h-5 w-5" />
+                    Disconnect Google Calendar
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleConnectCalendar}
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-full font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <CalendarCheck className="mr-2 h-5 w-5" />
+                    Connect Google Calendar
+                  </Button>
+                )}
+
+                <div className="mt-4 p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
+                  <p className="text-sm text-blue-800 font-medium">
+                    💡 <strong>How it works:</strong> When a customer pays for a booking, it will automatically be added to your Google Calendar with:
+                  </p>
+                  <ul className="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
+                    <li>Service name and client information</li>
+                    <li>Scheduled date and time</li>
+                    <li>Location address</li>
+                    <li>Reminders: 1 day before (email) and 1 hour before (popup)</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Privacy Settings */}
+        <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-200/20 rounded-full blur-2xl" />
+          <CardHeader className="relative z-10 bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+            <CardTitle className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent flex items-center gap-2">
+              <Lock className="h-6 w-6 text-green-600" />
+              Privacy Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="relative z-10 p-6">
+            <div className="flex flex-col gap-4">
+              <div className="font-bold text-gray-800 text-base mb-2">Data Sharing</div>
+              <label className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                 <Switch checked={privacy.stats} onCheckedChange={() => handlePrivacyChange("stats")} />
-                <span className="text-gray-700 text-base font-normal">Share job statistics anonymously to improve the service</span>
+                <span className="text-gray-700 text-base font-medium">Share job statistics anonymously to improve the service</span>
               </label>
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-3 p-4 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl border-2 border-green-200 hover:border-green-300 transition-colors cursor-pointer">
                 <Switch checked={privacy.publicProfile} onCheckedChange={() => handlePrivacyChange("publicProfile")} />
-                <span className="text-gray-700 text-base font-normal">Allow my profile to be discoverable in public directory</span>
+                <span className="text-gray-700 text-base font-medium">Allow my profile to be discoverable in public directory</span>
               </label>
             </div>
           </CardContent>
-          <CardFooter className="justify-end pt-2">
-            <Button className="bg-[#14B22D] hover:bg-[#13a428] px-6" type="button">
+          <CardFooter className="justify-end pt-4">
+            <Button 
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-semibold" 
+              type="button"
+            >
               Save Preferences
             </Button>
           </CardFooter>

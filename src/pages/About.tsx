@@ -1,90 +1,147 @@
 
+import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useTranslation } from "react-i18next";
 import AboutImage from "@/assets/images/about.png";
+import { Users, Heart, Building2 } from "lucide-react";
 
 const About = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow">
-        <div className="bg-green-500 py-12 sm:py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 px-2">About FixFinder</h1>
-            <p className="text-base sm:text-lg md:text-xl text-green-100 max-w-3xl mx-auto px-2">
-              Your trusted platform for connecting with skilled handymen for all your home maintenance needs
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-green-600 via-green-500 to-green-600 py-16 sm:py-20 md:py-24 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-200/20 rounded-full blur-3xl" />
+          
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 sm:mb-6 px-2 drop-shadow-2xl">
+              <span className="bg-gradient-to-r from-white to-green-100 bg-clip-text text-transparent">
+                {t('about.hero.title')}
+              </span>
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-green-50 max-w-3xl mx-auto px-2 leading-relaxed drop-shadow-lg">
+              {t('about.hero.subtitle')}
             </p>
           </div>
         </div>
         
-        <div className="py-12 sm:py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center gap-8 sm:gap-12">
-              <div className="md:w-1/2 w-full">
+        {/* Who We Are Section */}
+        <div className="py-16 sm:py-20 md:py-24 bg-white relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-20 left-0 w-72 h-72 bg-green-100/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-0 w-96 h-96 bg-orange-100/30 rounded-full blur-3xl" />
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex flex-col md:flex-row items-center gap-8 sm:gap-12 lg:gap-16">
+              <div className="md:w-1/2 w-full group">
                 <img 
                   src={AboutImage}
                   alt="About FixFinder" 
-                  className="rounded-lg shadow-xl w-full h-auto object-cover"
+                  className="rounded-2xl shadow-2xl w-full h-auto object-cover transform transition-all duration-300 hover:scale-105"
                 />
               </div>
               <div className="md:w-1/2 w-full">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Who We Are</h2>
-                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-                  FixFinder was founded with a simple mission: to connect homeowners and businesses with reliable, skilled handymen who can tackle any home maintenance or repair project efficiently and affordably.
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-800 mb-6 sm:mb-8">
+                  <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                    {t('about.whoWeAre.title')}
+                  </span>
+                </h2>
+                <div className="space-y-4 sm:space-y-5">
+                  <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                    {t('about.whoWeAre.paragraph1')}
+                  </p>
+                  <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                    {t('about.whoWeAre.paragraph2')}
+                  </p>
+                  <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                    {t('about.whoWeAre.paragraph3')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mission Section */}
+        <div className="py-16 sm:py-20 md:py-24 bg-gradient-to-br from-gray-50 via-green-50/30 to-gray-50 relative overflow-hidden">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-green-200/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl" />
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="text-center mb-12 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 px-2">
+                <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                  {t('about.mission.title')}
+                </span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+              <div className="group bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl flex-1 transition-all duration-300 transform hover:-translate-y-2 border border-green-100">
+                <div className="flex justify-center mb-5">
+                  <div className="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Users className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-green-600 mb-4 text-center">{t('about.mission.forCustomers.title')}</h3>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center">
+                  {t('about.mission.forCustomers.description')}
                 </p>
-                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-                  Our platform makes it easy to find, book, and pay for handyman services, eliminating the hassle of searching for trusted professionals when you need help around your home or office.
+              </div>
+              <div className="group bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl flex-1 transition-all duration-300 transform hover:-translate-y-2 border border-orange-100">
+                <div className="flex justify-center mb-5">
+                  <div className="p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Heart className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-orange-600 mb-4 text-center">{t('about.mission.forHandymen.title')}</h3>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center">
+                  {t('about.mission.forHandymen.description')}
                 </p>
-                <p className="text-sm sm:text-base text-gray-600">
-                  We carefully vet all handymen on our platform to ensure they have the skills, experience, and professionalism to deliver high-quality services that meet our standards and exceed your expectations.
+              </div>
+              <div className="group bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl flex-1 transition-all duration-300 transform hover:-translate-y-2 border border-green-100">
+                <div className="flex justify-center mb-5">
+                  <div className="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-green-600 mb-4 text-center">{t('about.mission.forCommunities.title')}</h3>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed text-center">
+                  {t('about.mission.forCommunities.description')}
                 </p>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="py-12 sm:py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-8 sm:mb-12 px-2">Our Mission</h2>
-            <div className="flex flex-col md:flex-row gap-6 sm:gap-8">
-              <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md flex-1">
-                <h3 className="text-lg sm:text-xl font-bold text-green-500 mb-3 sm:mb-4">For Customers</h3>
-                <p className="text-sm sm:text-base text-gray-600">
-                  We aim to provide a hassle-free experience for finding reliable handymen, ensuring your home maintenance and repair needs are met with quality service, fair pricing, and professional conduct.
-                </p>
-              </div>
-              <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md flex-1">
-                <h3 className="text-lg sm:text-xl font-bold text-orange-500 mb-3 sm:mb-4">For Handymen</h3>
-                <p className="text-sm sm:text-base text-gray-600">
-                  We strive to create opportunities for skilled tradespeople to connect with clients in their area, grow their business, and showcase their expertise through a trusted platform that values their skills.
-                </p>
-              </div>
-              <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md flex-1">
-                <h3 className="text-lg sm:text-xl font-bold text-blue-500 mb-3 sm:mb-4">For Communities</h3>
-                <p className="text-sm sm:text-base text-gray-600">
-                  We work to strengthen local economies by facilitating connections between community members and local service providers, keeping skills and resources within neighborhoods.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="py-12 sm:py-16 bg-green-500">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8 px-2">Ready to Experience FixFinder?</h2>
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-              <a 
-                href="/services" 
-                className="bg-white text-green-500 hover:bg-green-100 px-6 sm:px-8 py-2.5 sm:py-3 rounded-md font-medium text-sm sm:text-base"
+        {/* CTA Section */}
+        <div className="py-16 sm:py-20 md:py-24 bg-gradient-to-r from-green-600 via-green-500 to-green-600 relative overflow-hidden shadow-2xl">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-300/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-300/20 rounded-full blur-3xl" />
+          
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-8 sm:mb-10 px-2 drop-shadow-2xl">
+              {t('about.cta.title')}
+            </h2>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+              <Link 
+                to="/services" 
+                className="bg-white/90 backdrop-blur-sm text-green-600 hover:bg-white hover:text-green-700 px-8 sm:px-10 py-4 sm:py-5 rounded-full font-semibold text-base sm:text-lg shadow-xl transition-all duration-300 transform hover:scale-105"
               >
-                Browse Services
-              </a>
-              <a 
-                href="/signup" 
-                className="bg-orange-500 text-white hover:bg-orange-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-md font-medium text-sm sm:text-base"
+                {t('about.cta.browseServices')}
+              </Link>
+              <Link 
+                to="/signup" 
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-semibold text-base sm:text-lg shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105"
               >
-                Join FixFinder
-              </a>
+                {t('about.cta.joinFixFinder')}
+              </Link>
             </div>
           </div>
         </div>

@@ -353,14 +353,18 @@ const ClientRequests = ({ onStatusChange }: ClientRequestsProps) => {
   return (
     <div className="space-y-8">
       {/* Header with refresh button */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">Your Bookings</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <h2 className="text-2xl sm:text-3xl font-extrabold">
+          <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+            Your Bookings
+          </span>
+        </h2>
         <Button
           variant="outline"
           size="sm"
           onClick={handleManualRefresh}
           disabled={refreshing}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-white/80 backdrop-blur-sm border-2 border-green-500 text-green-700 hover:bg-green-50 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-4 py-2"
         >
           {refreshing ? (
             <RefreshCw className="h-4 w-4 animate-spin" />
@@ -389,27 +393,31 @@ const ClientRequests = ({ onStatusChange }: ClientRequestsProps) => {
           {actionRequired.length > 0 ? (
             // Show Action Required when there are bookings needing action
             <div className="space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-800">Action Required</h3>
-                <div className="flex items-center gap-2 px-3 py-1 bg-orange-50 border border-orange-200 rounded-full">
-                  <AlertCircle className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-700">{actionRequired.length} booking(s) need your attention</span>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className="w-2 h-10 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full shadow-lg"></div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+                  <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+                    Action Required
+                  </span>
+                </h3>
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-orange-300 rounded-full shadow-md">
+                  <AlertCircle className="h-5 w-5 text-orange-600" />
+                  <span className="text-sm font-bold text-orange-700">{actionRequired.length} booking(s) need your attention</span>
                 </div>
               </div>
               
               <div className="space-y-4">
                 {actionRequired.map(booking => (
                   <div key={booking._id} 
-                    className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                    className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-orange-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
                   >
-                    <div className="p-6">
+                    <div className="p-6 sm:p-8">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                            <h4 className="font-semibold text-gray-900">{booking.serviceName}</h4>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
+                          <div className="flex flex-wrap items-center gap-3 mb-3">
+                            <div className="w-4 h-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full shadow-lg"></div>
+                            <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceName}</h4>
+                            <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
                               {getStatusDisplayText(booking.status)}
                             </span>
                           </div>
@@ -444,7 +452,7 @@ const ClientRequests = ({ onStatusChange }: ClientRequestsProps) => {
                           <div>Last Action: {new Date(booking.lastActionDate).toLocaleDateString()} {new Date(booking.lastActionDate).toLocaleTimeString()}</div>
                         </div>
                         <Button
-                          className={`${getActionButtonStyle(booking.status)} px-6 py-2`}
+                          className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 font-bold"
                           onClick={() => setSelectedRequest(booking)}
                         >
                           {getActionButtonText(booking.status)}
@@ -532,14 +540,14 @@ const ClientRequests = ({ onStatusChange }: ClientRequestsProps) => {
 
         {/* Right Column: Recent Messages */}
         <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
+          <Card className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-orange-50 p-6 border-b border-green-200">
+              <CardTitle className="flex items-center gap-2 text-xl font-extrabold text-gray-800">
+                <MessageSquare className="h-6 w-6 text-green-600" />
                 Recent Messages
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {messagesLoading ? (
                 <div className="text-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
@@ -629,90 +637,98 @@ const ClientRequests = ({ onStatusChange }: ClientRequestsProps) => {
       {/* Middle Section: Ongoing Bookings (only show if Action Required section is displayed) */}
       {actionRequired.length > 0 && ongoing.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
-            <h3 className="text-lg font-semibold text-gray-800">Ongoing Bookings</h3>
-          </div>
-          
-          <div className="space-y-4">
-            {ongoing.map(booking => (
-              <div key={booking._id} 
-                className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
-              >
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                        <h4 className="font-semibold text-gray-900">{booking.serviceName}</h4>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
-                          {getStatusDisplayText(booking.status)}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 text-sm mb-3">{booking.description}</p>
-                      
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">Client:</span>
-                          <span className="ml-2 font-medium text-gray-900">{booking.clientName}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Location:</span>
-                          <span className="ml-2 font-medium text-gray-900">{booking.location.address}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Scheduled:</span>
-                          <span className="ml-2 font-medium text-gray-900">{formatDateTime(booking.scheduledTime)}</span>
-                        </div>
-                        {booking.fee && (
-                          <div>
-                            <span className="text-gray-500">Fee:</span>
-                            <span className="ml-2 font-bold text-green-600">${booking.fee}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="text-xs text-gray-500">
-                      ID: {booking._id}
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
-                      onClick={() => setSelectedRequest(booking)}
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-2 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-lg"></div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+                  <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                    Ongoing Bookings
+                  </span>
+                </h3>
               </div>
-            ))}
-          </div>
+              
+              <div className="space-y-4">
+                {ongoing.map(booking => (
+                  <div key={booking._id} 
+                    className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-blue-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
+                  >
+                    <div className="p-6 sm:p-8">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-3 mb-3">
+                            <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-lg"></div>
+                            <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceName}</h4>
+                            <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
+                              {getStatusDisplayText(booking.status)}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-3">{booking.description}</p>
+                          
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-500">Client:</span>
+                              <span className="ml-2 font-medium text-gray-900">{booking.clientName}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Location:</span>
+                              <span className="ml-2 font-medium text-gray-900">{booking.location.address}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Scheduled:</span>
+                              <span className="ml-2 font-medium text-gray-900">{formatDateTime(booking.scheduledTime)}</span>
+                            </div>
+                            {booking.fee && (
+                              <div>
+                                <span className="text-gray-500">Fee:</span>
+                                <span className="ml-2 font-bold text-green-600">${booking.fee}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <div className="text-xs text-gray-500">
+                          ID: {booking._id}
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300 px-6 py-2"
+                          onClick={() => setSelectedRequest(booking)}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
         </div>
       )}
 
       {/* Bottom Section: Recent Bookings (Rejected and Completed) */}
       {recent.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-2 h-8 bg-green-500 rounded-full"></div>
-            <h3 className="text-lg font-semibold text-gray-800">Recent Bookings</h3>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-2 h-10 bg-gradient-to-b from-green-500 to-green-600 rounded-full shadow-lg"></div>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-gray-800">
+              <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                Recent Bookings
+              </span>
+            </h3>
           </div>
           
           <div className="space-y-4">
             {recent.map(booking => (
               <div key={booking._id} 
-                className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-green-200/50 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] overflow-hidden"
               >
-                <div className="p-6">
+                <div className="p-6 sm:p-8">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <h4 className="font-semibold text-gray-900">{booking.serviceName}</h4>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadgeStyle(booking.status)}`}>
+                      <div className="flex flex-wrap items-center gap-3 mb-3">
+                        <div className="w-4 h-4 bg-gradient-to-br from-green-500 to-green-600 rounded-full shadow-lg"></div>
+                        <h4 className="font-extrabold text-lg text-gray-900">{booking.serviceName}</h4>
+                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 shadow-md ${getStatusBadgeStyle(booking.status)}`}>
                           {getStatusDisplayText(booking.status)}
                         </span>
                       </div>
@@ -747,7 +763,7 @@ const ClientRequests = ({ onStatusChange }: ClientRequestsProps) => {
                     </div>
                     <Button
                       variant="outline"
-                      className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                      className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300 px-6 py-2"
                       onClick={() => setSelectedRequest(booking)}
                     >
                       View Details

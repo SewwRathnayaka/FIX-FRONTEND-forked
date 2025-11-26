@@ -335,6 +335,48 @@ const Step4 = ({
       </div>
     </div>
 
+    {/* Certificate Upload Section */}
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
+        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+        <span>Upload Certificate</span>
+      </div>
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 transition-colors">
+        <input
+          type="file"
+          id="certificate-upload"
+          accept="image/*,.pdf"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              // Update personal state with certificate
+              const syntheticEvent = {
+                target: { name: 'certificate', value: file }
+              } as ChangeEvent<HTMLInputElement>;
+              onInputChange(syntheticEvent);
+            }
+          }}
+          className="hidden"
+        />
+        <label htmlFor="certificate-upload" className="cursor-pointer">
+          <div className="flex flex-col items-center">
+            <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <p className="text-sm text-gray-600 mb-1">
+              <span className="text-green-600 font-semibold">Click to upload</span> or drag and drop
+            </p>
+            <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+            {data.certificate && (
+              <p className="text-sm text-green-600 mt-2 font-medium">
+                ✓ {typeof data.certificate === 'object' && 'name' in data.certificate ? data.certificate.name : 'Certificate uploaded'}
+              </p>
+            )}
+          </div>
+        </label>
+      </div>
+    </div>
+
     {/* Availability Section */}
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
@@ -458,6 +500,7 @@ const HandymanRegistration = () => {
   const [step, setStep] = useState(0);
   const [personal, setPersonal] = useState(initialForm);
   const [photo, setPhoto] = useState<File | null>(null);
+  const [certificate, setCertificate] = useState<File | null>(null);
   const [services, setServices] = useState<string[]>([]);
   const [otherService, setOtherService] = useState("");
   const [certs, setCerts] = useState<string[]>([]);
@@ -725,6 +768,16 @@ const HandymanRegistration = () => {
         reader.readAsDataURL(photo!);
       });
 
+      // Convert certificate to base64 if provided
+      let certificateBase64: string | null = null;
+      if (certificate) {
+        certificateBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(certificate);
+        });
+      }
+
       // Prepare handyman data
       const handymanData = {
         clerkUserId: user?.id, // Add Clerk user ID
@@ -733,6 +786,7 @@ const HandymanRegistration = () => {
         contactNumber: personal.contactNumber,
         emailAddress: personal.emailAddress,
         personalPhoto: photoBase64,
+        certificate: certificateBase64, // Add certificate
         experience: parseInt(personal.experience) || 0,
         certifications: certs,
         services: services, // Only service IDs, no skills array
@@ -840,8 +894,14 @@ const HandymanRegistration = () => {
 
           {step === 3 && (
             <Step4
-              data={personal}
-              onInputChange={handlePersonalChange}
+              data={{...personal, certificate}}
+              onInputChange={(e) => {
+                if (e.target.name === 'certificate') {
+                  setCertificate(e.target.value as any);
+                } else {
+                  handlePersonalChange(e);
+                }
+              }}
               certs={certs}
               onCertChange={handleCertChange}
               days={days}

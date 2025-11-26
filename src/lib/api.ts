@@ -2,7 +2,10 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // API Configuration - Load from environment variables
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://fixfinder-backend-zrn7.onrender.com/api';
-const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || '10000');
+// Increased timeout for Render free tier (cold starts can take 30-60 seconds)
+// Production: 60000ms (60s), Development: 30000ms (30s)
+const DEFAULT_TIMEOUT = import.meta.env.VITE_NODE_ENV === 'production' ? 60000 : 30000;
+const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || String(DEFAULT_TIMEOUT));
 const NODE_ENV = import.meta.env.VITE_NODE_ENV || 'development';
 
 // Create axios instance
@@ -22,11 +25,35 @@ console.log('API Configuration:', {
   nodeEnv: NODE_ENV
 });
 
-// Request interceptor to add auth token
+// Global store for current user info (updated by components using useUser hook)
+let currentUserInfo: { id: string; type: 'client' | 'provider' } | null = null;
+
+// Export function to update user info (called by components)
+export const setApiUserInfo = (user: { id: string; type: 'client' | 'provider' } | null) => {
+  currentUserInfo = user;
+};
+
+// Helper function to get current user info
+const getCurrentUserInfo = (): { id: string; type: 'client' | 'provider' } | null => {
+  return currentUserInfo;
+};
+
+// Request interceptor to add auth headers
 api.interceptors.request.use(
   (config) => {
-    // For Clerk authentication, we don't need to manually add tokens
-    // Clerk handles authentication automatically
+    // Skip adding headers if they're already present (for custom requests)
+    if (config.headers['X-User-ID'] && config.headers['X-User-Type']) {
+      return config;
+    }
+
+    // Get current user info from global store
+    const user = getCurrentUserInfo();
+    
+    if (user) {
+      config.headers['X-User-ID'] = user.id;
+      config.headers['X-User-Type'] = user.type;
+    }
+
     return config;
   },
   (error) => {
@@ -40,7 +67,14 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle common errors silently
+    // Provide better error messages for timeout errors
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      console.error('⏱️ Request timeout:', {
+        url: error.config?.url,
+        timeout: API_TIMEOUT,
+        message: `Request took longer than ${API_TIMEOUT}ms. This is common on Render free tier due to cold starts.`
+      });
+    }
     return Promise.reject(error);
   }
 );
@@ -76,6 +110,11 @@ export class ServicesAPI {
 export class BookingsAPI {
   static async getAllBookings() {
     const response = await api.get('/bookings');
+    return response.data;
+  }
+
+  static async getMyBookings() {
+    const response = await api.get('/bookings/my');
     return response.data;
   }
 
@@ -220,6 +259,23 @@ export class NotificationsAPI {
 
   static async deleteNotification(notificationId: string) {
     const response = await api.delete(`/notifications/${notificationId}`);
+    return response.data;
+  }
+}
+
+export class GoogleCalendarAPI {
+  static async getAuthUrl() {
+    const response = await api.get('/google-calendar/auth-url');
+    return response.data;
+  }
+
+  static async getConnectionStatus() {
+    const response = await api.get('/google-calendar/status');
+    return response.data;
+  }
+
+  static async disconnect() {
+    const response = await api.delete('/google-calendar/disconnect');
     return response.data;
   }
 }

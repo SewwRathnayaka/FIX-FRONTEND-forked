@@ -1,6 +1,6 @@
 import { useUser } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
-import { AuthAPI } from '@/lib/api';
+import { AuthAPI, setApiUserInfo } from '@/lib/api';
 
 interface UserRole {
   userId: string;
@@ -45,6 +45,22 @@ export const useAuth = () => {
 
     verifyRole();
   }, [user?.id, isSignedIn]);
+
+  // Update global user info for API interceptor
+  useEffect(() => {
+    if (user?.id && isSignedIn) {
+      // Determine user type based on metadata
+      const isHandyman = user.unsafeMetadata?.isHandyman === true || user.publicMetadata?.isHandyman === true;
+      const userType: 'client' | 'provider' = isHandyman ? 'provider' : 'client';
+      
+      setApiUserInfo({
+        id: user.id,
+        type: userType,
+      });
+    } else {
+      setApiUserInfo(null);
+    }
+  }, [user?.id, isSignedIn, user?.unsafeMetadata?.isHandyman, user?.publicMetadata?.isHandyman]);
 
   // Determine user type based on database verification
   // A user can be both a client AND a handyman
