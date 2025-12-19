@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useTranslation } from "react-i18next";
-import AboutImage from "@/assets/images/about.png";
 import { Users, Heart, Building2 } from "lucide-react";
 
 const About = () => {
@@ -40,7 +39,7 @@ const About = () => {
             <div className="flex flex-col md:flex-row items-center gap-8 sm:gap-12 lg:gap-16">
               <div className="md:w-1/2 w-full group">
                 <img 
-                  src={AboutImage}
+                  src={"src/assets/images/about.png"}
                   alt="About FixFinder" 
                   className="rounded-2xl shadow-2xl w-full h-auto object-cover transform transition-all duration-300 hover:scale-105"
                 />

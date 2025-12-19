@@ -6,7 +6,7 @@ import BookingPopup from "@/components/client/BookingPopup";
 import RecentMessages from "@/components/client/RecentMessages";
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useUser } from '@clerk/clerk-react';
-import { useServices, useMyBookings } from "@/hooks/use-api";
+import { useServices, useMyBookings, usePopularServices } from "@/hooks/use-api";
 import { socketService } from "@/lib/socket";
 import { Input } from "@/components/ui/input";
 import { ClientAPI } from "@/lib/api";
@@ -142,6 +142,9 @@ const ClientDashboard = () => {
   // Fetch services from backend
   const { data: servicesResponse, isLoading, error } = useServices();
 
+  // Fetch popular services (top 4 by booking count)
+  const { data: popularServicesResponse, isLoading: isLoadingPopular, refetch: refetchPopularServices } = usePopularServices();
+
   // Fetch current user's bookings
   const { data: bookingsResponse, isLoading: isLoadingBookings, error: bookingsError, refetch: refetchBookings } = useMyBookings(user);
 
@@ -149,7 +152,9 @@ const ClientDashboard = () => {
   const handleBookingStatusChange = useCallback(() => {
     setRefreshKey(prev => prev + 1);
     refetchBookings();
-  }, [refetchBookings]);
+    // Also refresh popular services when bookings change
+    refetchPopularServices();
+  }, [refetchBookings, refetchPopularServices]);
 
   // Check if we need to refresh bookings (e.g., coming from booking creation)
   useEffect(() => {
@@ -169,6 +174,8 @@ const ClientDashboard = () => {
       console.log('Client dashboard - Status change detected via WebSocket:', update);
       // Refresh bookings when status changes
       refetchBookings();
+      // Refresh popular services when bookings change
+      refetchPopularServices();
       // Update refresh key to force re-render
       setRefreshKey(prev => prev + 1);
     });
@@ -177,7 +184,7 @@ const ClientDashboard = () => {
     return () => {
       socketService.removeAllListeners();
     };
-  }, [user, refetchBookings]);
+  }, [user, refetchBookings, refetchPopularServices]);
 
   // Debug logging
   console.log('ClientDashboard - User state:', { 
@@ -356,19 +363,37 @@ const ClientDashboard = () => {
     );
   }, [services, search]);
 
-  // Get popular services (top 4 by usage count)
+  // Get popular services from API (top 4 by booking count)
   const popularServices = useMemo(() => {
-    return services
-      .sort((a: any, b: any) => (b.usageCount || 0) - (a.usageCount || 0))
-      .slice(0, 4)
-      .map((service: any) => ({
-        _id: service._id,
-        id: service._id,
-        name: service.name,
-        icon: getServiceIcon(service.name),
-        usageCount: service.usageCount || 0
-      }));
-  }, [services]);
+    // Use real data from API if available
+    if (popularServicesResponse?.data && Array.isArray(popularServicesResponse.data) && popularServicesResponse.data.length > 0) {
+      return popularServicesResponse.data
+        .slice(0, 4) // Ensure we only show top 4
+        .map((service: any) => ({
+          _id: service._id,
+          id: service._id || service.serviceId,
+          name: service.name,
+          icon: getServiceIcon(service.name),
+          usageCount: service.usageCount || service.bookingCount || 0
+        }));
+    }
+    
+    // Fallback: if no popular services from API, use services sorted by usageCount (for backward compatibility)
+    if (services.length > 0) {
+      return services
+        .sort((a: any, b: any) => (b.usageCount || 0) - (a.usageCount || 0))
+        .slice(0, 4)
+        .map((service: any) => ({
+          _id: service._id,
+          id: service._id,
+          name: service.name,
+          icon: getServiceIcon(service.name),
+          usageCount: service.usageCount || 0
+        }));
+    }
+    
+    return [];
+  }, [popularServicesResponse, services]);
 
   const handleServiceClick = (service: {
     _id: string;

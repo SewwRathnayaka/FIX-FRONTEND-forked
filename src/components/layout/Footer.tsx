@@ -14,7 +14,7 @@ const Footer = () => {
             {/* LOGO IMAGE HOLDER */}
             <div className="mb-4">
               <img
-                src="/lovable-uploads/a707e924-f315-4907-a798-16e19d2e7a69.png"
+                src="/images/a707e924-f315-4907-a798-16e19d2e7a69.webp"
                 alt="FixFinder Logo"
                 className="h-7 sm:h-8 object-contain transition-transform duration-300 hover:scale-105"
                 style={{ maxWidth: 120 }}
@@ -186,7 +186,7 @@ const Footer = () => {
           <div className="flex justify-center mb-4">
             {/* LOGO IMAGE HOLDER */}
             <img
-              src="/lovable-uploads/a707e924-f315-4907-a798-16e19d2e7a69.png"
+              src="/images/a707e924-f315-4907-a798-16e19d2e7a69.webp"
               alt="FixFinder Logo"
               className="h-7 sm:h-8 object-contain drop-shadow-lg transition-transform duration-300 hover:scale-105"
               style={{ maxWidth: 120 }}

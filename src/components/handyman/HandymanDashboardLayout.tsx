@@ -90,7 +90,7 @@ const HandymanDashboardLayout = ({
             <div className="flex-1 flex items-center justify-start"></div>
             <div className="flex-1 flex items-center justify-center">
               <img
-                src="/lovable-uploads/f8b0003c-8de6-4035-b677-59817d3a83cf.png"
+                src="/images/f8b0003c-8de6-4035-b677-59817d3a83cf.webp"
                 alt="FixFinder Logo"
                 className="h-8 sm:h-10 object-contain"
                 style={{ maxWidth: 140 }}
@@ -191,7 +191,7 @@ const HandymanDashboardLayout = ({
       <div className="w-full flex justify-center p-4 sm:p-5 bg-white border-t border-gray-200 shadow-xl">
         <div className="flex items-center">
           <img
-            src="/lovable-uploads/dd421578-d45c-4aa5-ac80-e96f8fe812e5.png"
+            src="/images/dd421578-d45c-4aa5-ac80-e96f8fe812e5.webp"
             alt="FixFinder New Logo"
             className="h-6 sm:h-8 object-contain"
             style={{ maxWidth: 120 }}

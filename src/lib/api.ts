@@ -91,6 +91,11 @@ export class ServicesAPI {
     return response.data;
   }
 
+  static async getPopularServices() {
+    const response = await api.get('/services/popular');
+    return response.data;
+  }
+
   static async createService(serviceData: any) {
     const response = await api.post('/services', serviceData);
     return response.data;

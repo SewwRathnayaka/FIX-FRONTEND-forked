@@ -67,49 +67,49 @@ const HowItWorks = () => {
       titleKey: "homepage.howItWorks.chooseService.title",
       descriptionKey: "homepage.howItWorks.chooseService.description",
       color: "yellow" as const,
-      image: "/lovable-uploads/How-it-works/Choose Service.png"
+      image: "/images/How-it-works/Choose Service.webp"
     },
     {
       icon: <UserCheck className="h-6 w-6 text-green-500" />,
       titleKey: "homepage.howItWorks.chooseProvider.title",
       descriptionKey: "homepage.howItWorks.chooseProvider.description",
       color: "orange" as const,
-      image: "/lovable-uploads/How-it-works/Choose Service Provider.png"
+      image: "/images/How-it-works/Choose Service Provider.webp"
     },
     {
       icon: <FileText className="h-6 w-6 text-green-500" />,
       titleKey: "homepage.howItWorks.createBooking.title",
       descriptionKey: "homepage.howItWorks.createBooking.description",
       color: "yellow" as const,
-      image: "/lovable-uploads/How-it-works/Create Booking.png"
+      image: "/images/How-it-works/Create Booking.webp"
     },
     {
       icon: <DollarSign className="h-6 w-6 text-green-500" />,
       titleKey: "homepage.howItWorks.handymanConfirms.title",
       descriptionKey: "homepage.howItWorks.handymanConfirms.description",
       color: "orange" as const,
-      image: "/lovable-uploads/How-it-works/Handyman Confirms.png"
+      image: "/images/How-it-works/Handyman Confirms.webp"
     },
     {
       icon: <CreditCard className="h-6 w-6 text-green-500" />,
       titleKey: "homepage.howItWorks.customerPays.title",
       descriptionKey: "homepage.howItWorks.customerPays.description",
       color: "yellow" as const,
-      image: "/lovable-uploads/How-it-works/Pay & Confirm.png"
+      image: "/images/How-it-works/Pay & Confirm.webp"
     },
     {
       icon: <Wrench className="h-6 w-6 text-green-500" />,
       titleKey: "homepage.howItWorks.handymanCompletes.title",
       descriptionKey: "homepage.howItWorks.handymanCompletes.description",
       color: "orange" as const,
-      image: "/lovable-uploads/How-it-works/Work Completion.png"
+      image: "/images/How-it-works/Work Completion.webp"
     },
     {
       icon: <Star className="h-6 w-6 text-green-500" />,
       titleKey: "homepage.howItWorks.customerReviews.title",
       descriptionKey: "homepage.howItWorks.customerReviews.description",
       color: "yellow" as const,
-      image: "/lovable-uploads/How-it-works/Confirm & Review.png"
+      image: "/images/How-it-works/Confirm & Review.webp"
     }
   ];
 

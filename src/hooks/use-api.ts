@@ -27,6 +27,15 @@ export const useService = (serviceId: string) => {
   });
 };
 
+export const usePopularServices = () => {
+  return useQuery({
+    queryKey: ['services', 'popular'],
+    queryFn: ServicesAPI.getPopularServices,
+    staleTime: 60 * 60 * 1000, // 2 minutes - refresh more frequently since booking counts change
+    refetchInterval: 60 * 60 * 1000, // Refetch every 5 minutes to keep counts updated
+  });
+};
+
 export const useCreateService = () => {
   const queryClient = useQueryClient();
   
@@ -142,6 +151,8 @@ export const useCreateBooking = () => {
     mutationFn: BookingsAPI.createBooking,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      // Invalidate popular services when a new booking is created
+      queryClient.invalidateQueries({ queryKey: ['services', 'popular'] });
       // Invalidate specific client/provider bookings
       if (variables.clientId) {
         queryClient.invalidateQueries({ queryKey: ['bookings', 'client', variables.clientId] });

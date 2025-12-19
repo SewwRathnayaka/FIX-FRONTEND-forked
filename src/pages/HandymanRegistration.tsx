@@ -24,10 +24,60 @@ const certifications = [
 const paymentMethods = [
   { label: "Cash", name: "cash" },
   { label: "Bank Transfer", name: "bank" },
-  { label: "Frimi", name: "frimi" },
-  { label: "ez Cash", name: "ezcash" },
-  { label: "Other:", name: "other" },
+  { label: "Online Payments", name: "online" },
 ];
+
+// Validation functions
+const validateNIC = (nic: string): { valid: boolean; message?: string } => {
+  if (!nic || nic.trim() === '') {
+    return { valid: false, message: 'NIC is required' };
+  }
+  
+  const trimmedNIC = nic.trim();
+  
+  // Old NIC format: 9 digits + V or X
+  const oldNICRegex = /^\d{9}[VvXx]$/;
+  // New NIC format: 12 digits
+  const newNICRegex = /^[0-9]{12}$/;
+  
+  if (oldNICRegex.test(trimmedNIC)) {
+    return { valid: true };
+  } else if (newNICRegex.test(trimmedNIC)) {
+    return { valid: true };
+  } else {
+    return { 
+      valid: false, 
+      message: 'Invalid NIC format. Use old format (9 digits + V/X) or new format (12 digits)' 
+    };
+  }
+};
+
+const validateMobileNumber = (mobile: string): { valid: boolean; message?: string } => {
+  if (!mobile || mobile.trim() === '') {
+    return { valid: false, message: 'Contact number is required' };
+  }
+  
+  const trimmedMobile = mobile.trim();
+  
+  // Remove spaces and dashes
+  const cleanedMobile = trimmedMobile.replace(/[\s-]/g, '');
+  
+  // Local format: 10 digits starting with 07
+  const localFormatRegex = /^07\d{8}$/;
+  // International format: +947 or 947 followed by 7 more digits
+  const internationalFormatRegex = /^(\+?947|947)\d{7}$/;
+  
+  if (localFormatRegex.test(cleanedMobile)) {
+    return { valid: true };
+  } else if (internationalFormatRegex.test(cleanedMobile)) {
+    return { valid: true };
+  } else {
+    return { 
+      valid: false, 
+      message: 'Invalid mobile number. Use format: 07XXXXXXXX or +947XXXXXXXX' 
+    };
+  }
+};
 
 const StepIndicator = ({ step }: { step: number }) => (
   <div className="flex justify-center items-center mt-2 mb-8">
@@ -35,16 +85,16 @@ const StepIndicator = ({ step }: { step: number }) => (
       <React.Fragment key={n}>
         <div
           className={cn(
-            "w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold",
+            "w-10 h-10 rounded-full flex items-center justify-center text-lg font-extrabold shadow-lg transition-all duration-300",
             step > idx
-              ? "bg-green-500 text-white"
+              ? "bg-gradient-to-br from-green-500 to-green-600 text-white transform scale-110"
               : step === idx
-              ? "bg-green-500 text-white"
+              ? "bg-gradient-to-br from-green-500 to-green-600 text-white transform scale-110 shadow-xl"
               : "bg-gray-200 text-gray-600"
           )}
         >
           {step > idx ? (
-            <svg width="18" height="18" className="mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6 9 17l-5-5"/></svg>
+            <svg width="18" height="18" className="mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
           ) : (
             n
           )}
@@ -52,8 +102,8 @@ const StepIndicator = ({ step }: { step: number }) => (
         {idx < 3 && (
           <div
             className={cn(
-              "h-1 w-8 mx-1 rounded",
-              step > idx ? "bg-green-500" : "bg-gray-200"
+              "h-1.5 w-12 mx-2 rounded-full transition-all duration-300",
+              step > idx ? "bg-gradient-to-r from-green-500 to-green-600 shadow-md" : "bg-gray-200"
             )}
           />
         )}
@@ -62,25 +112,33 @@ const StepIndicator = ({ step }: { step: number }) => (
   </div>
 );
 
-const Step1 = ({data, onChange, clientData}: { 
+const Step1 = ({data, onChange, clientData, nicFrontPhoto, nicBackPhoto, onNicFrontPhoto, onNicBackPhoto, nicError, mobileError}: { 
   data: any, 
   onChange: (e: ChangeEvent<HTMLInputElement>) => void,
-  clientData?: any 
+  clientData?: any,
+  nicFrontPhoto: File | null,
+  nicBackPhoto: File | null,
+  onNicFrontPhoto: (e: ChangeEvent<HTMLInputElement>) => void,
+  onNicBackPhoto: (e: ChangeEvent<HTMLInputElement>) => void,
+  nicError?: string,
+  mobileError?: string,
 }) => (
-  <div>
-    <div className="flex items-center text-2xl font-semibold text-gray-700 mb-6">
-      <svg width="26" className="mr-2 text-gray-500" height="26" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 00-8 0v2"/><circle cx="12" cy="7" r="4"/><rect width="24" height="24"/></svg>
-      <span>Personal Information</span>
+  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-md">
+    <div className="flex items-center text-xl font-extrabold mb-6">
+      <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-lg mr-3 shadow-lg">
+        <svg width="22" className="text-white" height="22" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 00-8 0v2"/><circle cx="12" cy="7" r="4"/><rect width="24" height="24"/></svg>
+      </div>
+      <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Personal Information</span>
     </div>
     
     {/* Auto-fill notification */}
     {clientData && (
-      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <div className="flex items-center gap-2 text-blue-800">
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200/50 rounded-xl shadow-md">
+        <div className="flex items-center gap-2 text-blue-800 font-semibold">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          <span className="font-medium">Profile Information Auto-filled</span>
+          <span>Profile Information Auto-filled</span>
         </div>
         <p className="text-blue-700 text-sm mt-1">
           We've pre-filled some fields using your existing client profile. You can edit any information as needed.
@@ -100,7 +158,7 @@ const Step1 = ({data, onChange, clientData}: {
           name="name"
           value={data.name}
           onChange={onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
           type="text"
           placeholder="Full Name"
           autoComplete="name"
@@ -115,13 +173,95 @@ const Step1 = ({data, onChange, clientData}: {
           name="nic"
           value={data.nic}
           onChange={onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+          className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white ${
+            nicError ? 'border-red-500' : 'border-gray-200'
+          }`}
           type="text"
-          placeholder="NIC / Driving License Number"
+          placeholder="NIC / Driving License Number (e.g., 931234567V or 199312345678)"
           required
         />
-        <p className="text-xs text-gray-500 mt-1">This information is not stored in your client profile and must be provided.</p>
+        {nicError && (
+          <p className="text-xs text-red-500 mt-1">{nicError}</p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">Old format: 9 digits + V/X (e.g., 931234567V). New format: 12 digits (e.g., 199312345678)</p>
       </div>
+      
+      {/* NIC Photo Upload Section */}
+      <div className="space-y-3">
+        <label className="block mb-1 text-gray-700 font-medium">
+          NIC Front & Back Photos <span className="text-red-500">*</span>
+        </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Front Photo */}
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-green-400 transition-all duration-300 bg-gradient-to-br from-gray-50 to-white">
+            <label htmlFor="nic-front-upload" className="cursor-pointer">
+              <div className="flex flex-col items-center">
+                {nicFrontPhoto ? (
+                  <>
+                    <img
+                      src={URL.createObjectURL(nicFrontPhoto)}
+                      alt="NIC Front preview"
+                      className="h-24 w-full object-cover rounded-lg border-2 border-green-200 mb-2"
+                    />
+                    <span className="text-green-700 font-semibold text-sm">Front photo selected</span>
+                    <span className="text-xs text-gray-500 mt-1">Click to change</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-sm text-gray-600 text-center">NIC Front</p>
+                    <p className="text-xs text-gray-500 mt-1">Click to upload</p>
+                  </>
+                )}
+              </div>
+            </label>
+            <input
+              id="nic-front-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onNicFrontPhoto}
+            />
+          </div>
+          
+          {/* Back Photo */}
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-green-400 transition-all duration-300 bg-gradient-to-br from-gray-50 to-white">
+            <label htmlFor="nic-back-upload" className="cursor-pointer">
+              <div className="flex flex-col items-center">
+                {nicBackPhoto ? (
+                  <>
+                    <img
+                      src={URL.createObjectURL(nicBackPhoto)}
+                      alt="NIC Back preview"
+                      className="h-24 w-full object-cover rounded-lg border-2 border-green-200 mb-2"
+                    />
+                    <span className="text-green-700 font-semibold text-sm">Back photo selected</span>
+                    <span className="text-xs text-gray-500 mt-1">Click to change</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-sm text-gray-600 text-center">NIC Back</p>
+                    <p className="text-xs text-gray-500 mt-1">Click to upload</p>
+                  </>
+                )}
+              </div>
+            </label>
+            <input
+              id="nic-back-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onNicBackPhoto}
+            />
+          </div>
+        </div>
+      </div>
+      
       <div>
         <label className="block mb-1 text-gray-700 font-medium">
           Contact Number <span className="text-red-500">*</span>
@@ -133,12 +273,18 @@ const Step1 = ({data, onChange, clientData}: {
           name="contactNumber"
           value={data.contactNumber}
           onChange={onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+          className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white ${
+            mobileError ? 'border-red-500' : 'border-gray-200'
+          }`}
           type="text"
-          placeholder="Contact Number"
+          placeholder="Contact Number (e.g., 0771234567 or +94771234567)"
           autoComplete="tel"
           required
         />
+        {mobileError && (
+          <p className="text-xs text-red-500 mt-1">{mobileError}</p>
+        )}
+        <p className="text-xs text-gray-500 mt-1">Format: 07XXXXXXXX or +947XXXXXXXX</p>
       </div>
       <div>
         <label className="block mb-1 text-gray-700 font-medium">
@@ -150,7 +296,7 @@ const Step1 = ({data, onChange, clientData}: {
         <input
           name="emailAddress"
           value={data.emailAddress}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50"
+          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50 transition-all duration-300 shadow-sm"
           type="email"
           placeholder="Email Address"
           autoComplete="email"
@@ -170,16 +316,18 @@ const Step2 = ({
   photo: File | null;
   onPhoto: (e: ChangeEvent<HTMLInputElement>) => void;
 }) => (
-  <div>
-    <div className="flex items-center text-2xl font-semibold text-gray-700 mb-6">
-      <svg width="26" height="26" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M16 16v6m0 0v2m0-2h2m-2 0H8m8-2v-2a4 4 0 00-8 0v2"/>
-        <circle cx="12" cy="7" r="4"/>
-        <rect width="24" height="24"/>
-      </svg>
-      <span>Profile Photo</span>
+  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-md">
+    <div className="flex items-center text-xl font-extrabold mb-6">
+      <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-lg mr-3 shadow-lg">
+        <svg width="22" height="22" className="text-white" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 16v6m0 0v2m0-2h2m-2 0H8m8-2v-2a4 4 0 00-8 0v2"/>
+          <circle cx="12" cy="7" r="4"/>
+          <rect width="24" height="24"/>
+        </svg>
+      </div>
+      <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Profile Photo <span className="text-red-500">*</span></span>
     </div>
-    <div className="border-2 border-dashed border-gray-300 rounded-lg flex flex-col justify-center items-center py-12 mb-4">
+    <div className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col justify-center items-center py-12 mb-4 hover:border-green-400 transition-all duration-300 bg-gradient-to-br from-gray-50 to-white">
       {!photo ? (
         <div className="flex flex-col items-center">
           <div className="rounded-full bg-gray-100 h-16 w-16 flex justify-center items-center mb-4">
@@ -192,7 +340,7 @@ const Step2 = ({
           <span className="text-gray-500 mb-3 text-center">Upload a clear, professional-looking photo</span>
           <span className="text-sm text-gray-400 mb-4 text-center">This will be displayed to potential clients</span>
           <label htmlFor="profile-upload" className="cursor-pointer">
-            <span className="bg-green-500 text-white font-medium px-6 py-3 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors inline-block">
+            <span className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 inline-block">
               Choose Photo
             </span>
           </label>
@@ -204,10 +352,10 @@ const Step2 = ({
             alt="Profile preview"
             className="h-28 w-28 object-cover rounded-full border-4 border-green-200 mb-4"
           />
-          <span className="text-green-700 font-medium">Photo selected successfully!</span>
+          <span className="text-green-700 font-semibold">Photo selected successfully!</span>
           <span className="text-sm text-gray-500 mt-1 mb-3">Click to change photo</span>
           <label htmlFor="profile-upload" className="cursor-pointer">
-            <span className="bg-gray-500 text-white font-medium px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors inline-block text-sm">
+            <span className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 inline-block text-sm">
               Change Photo
             </span>
           </label>
@@ -239,15 +387,20 @@ const Step3 = ({
   availableServices: any[];
   clientData?: any;
 }) => (
-  <div>
-    <div className="text-2xl font-semibold text-gray-700 mb-6">
-      Skillset & Services Offered
+  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-md">
+    <div className="flex items-center text-xl font-extrabold mb-6">
+      <div className="bg-gradient-to-br from-green-500 to-green-600 p-2 rounded-lg mr-3 shadow-lg">
+        <svg width="22" height="22" className="text-white" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Skillset & Services Offered <span className="text-red-500">*</span></span>
     </div>
-    <div className="mb-4 text-gray-600">Select all services you can provide</div>
+    <div className="mb-4 text-gray-600 font-medium">Select all services you can provide</div>
     <div className="grid grid-cols-1 gap-3">
       {availableServices.length > 0 ? (
         availableServices.map((service) => (
-          <div key={service._id} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
+          <div key={service._id} className="flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:shadow-md transition-all duration-300 bg-white">
             <input
               id={`skill-${service._id}`}
               type="checkbox"
@@ -274,7 +427,7 @@ const Step3 = ({
 const Step4 = ({
   data, onInputChange, certs, onCertChange,
   days, hours, onDaysChange, onHoursChange,
-  pay, onPayChange, otherPay, onOtherPayChange,
+  pay, onPayChange,
   clientData, onLocationChange, locationInputValue, onLocationInputChange
 }: {
   data: any;
@@ -287,19 +440,19 @@ const Step4 = ({
   onHoursChange: (e: ChangeEvent<HTMLInputElement>) => void;
   pay: string[];
   onPayChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  otherPay: string;
-  onOtherPayChange: (e: ChangeEvent<HTMLInputElement>) => void;
   clientData?: any;
   onLocationChange: (locationData: any) => void;
   locationInputValue: string;
   onLocationInputChange: (value: string) => void;
 }) => (
-  <div className="space-y-6">
+  <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 shadow-md space-y-6">
     {/* Experience Section */}
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-1M9 8h6M9 11h6"/></svg>
-        <span>Years of Experience</span>
+      <div className="flex items-center gap-2 text-lg font-extrabold">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 rounded-lg shadow-md">
+          <svg width="18" height="18" className="text-white" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-1M9 8h6M9 11h6"/></svg>
+        </div>
+        <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Years of Experience <span className="text-red-500">*</span></span>
       </div>
       <input
         name="experience"
@@ -307,20 +460,22 @@ const Step4 = ({
         onChange={onInputChange}
         type="number"
         min={0}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
         placeholder="e.g., 5 years"
       />
     </div>
 
     {/* Certifications Section */}
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M3 7V5a2 2 0 012-2h3.5"/></svg>
-        <span>Certifications / Training</span>
+      <div className="flex items-center gap-2 text-lg font-extrabold">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 rounded-lg shadow-md">
+          <svg width="18" height="18" className="text-white" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M3 7V5a2 2 0 012-2h3.5"/></svg>
+        </div>
+        <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Certifications / Training</span>
       </div>
       <div className="grid grid-cols-1 gap-3">
         {certifications.map(cert => (
-          <div key={cert.name} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
+          <div key={cert.name} className="flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:shadow-md transition-all duration-300 bg-white">
             <input
               type="checkbox"
               id={`cert-${cert.name}`}
@@ -337,11 +492,13 @@ const Step4 = ({
 
     {/* Certificate Upload Section */}
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-        <span>Upload Certificate</span>
+      <div className="flex items-center gap-2 text-lg font-extrabold">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 rounded-lg shadow-md">
+          <svg width="18" height="18" className="text-white" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+        </div>
+        <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Upload Certificate</span>
       </div>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 transition-colors">
+      <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-green-400 transition-all duration-300 bg-gradient-to-br from-gray-50 to-white">
         <input
           type="file"
           id="certificate-upload"
@@ -349,10 +506,10 @@ const Step4 = ({
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) {
-              // Update personal state with certificate
+              // Directly set certificate file
               const syntheticEvent = {
                 target: { name: 'certificate', value: file }
-              } as ChangeEvent<HTMLInputElement>;
+              } as unknown as ChangeEvent<HTMLInputElement>;
               onInputChange(syntheticEvent);
             }
           }}
@@ -377,19 +534,22 @@ const Step4 = ({
       </div>
     </div>
 
-    {/* Availability Section */}
+      {/* Availability Section */}
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 6v-2h8v2"/></svg>
-        <span>Working Schedule</span>
+      <div className="flex items-center gap-2 text-lg font-extrabold">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 rounded-lg shadow-md">
+          <svg width="18" height="18" className="text-white" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 6v-2h8v2"/></svg>
+        </div>
+        <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Working Schedule</span>
       </div>
+      <p className="text-xs text-gray-500 -mt-2">Note: Your working schedule can be amended later.</p>
       
       {/* Working Days */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">Working Days</label>
+        <label className="block text-sm font-semibold text-gray-700">Working Days</label>
         <div className="grid grid-cols-2 gap-3">
           {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-            <div key={day} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
+            <div key={day} className="flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:shadow-md transition-all duration-300 bg-white">
               <input
                 type="checkbox"
                 id={`day-${day.toLowerCase()}`}
@@ -407,26 +567,26 @@ const Step4 = ({
 
       {/* Working Hours */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">Working Hours</label>
+        <label className="block text-sm font-semibold text-gray-700">Working Hours</label>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs text-gray-600 mb-1">Start Time</label>
+            <label className="block text-xs text-gray-600 mb-1 font-medium">Start Time</label>
             <input
               type="time"
               name="workHoursStart"
               value={hours.split('-')[0] || ''}
               onChange={onHoursChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-600 mb-1">End Time</label>
+            <label className="block text-xs text-gray-600 mb-1 font-medium">End Time</label>
             <input
               type="time"
               name="workHoursEnd"
               value={hours.split('-')[1] || ''}
               onChange={onHoursChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md bg-white"
             />
           </div>
         </div>
@@ -435,11 +595,13 @@ const Step4 = ({
 
     {/* Location Section */}
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-2">
-        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Location</span>
+      <div className="flex items-center gap-2 text-lg font-extrabold mb-2">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 rounded-lg shadow-md">
+          <svg width="18" height="18" className="text-white" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Location <span className="text-red-500">*</span></span>
         {clientData?.location && (
-          <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Auto-filled</span>
+          <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full font-semibold">Auto-filled</span>
         )}
       </div>
       <LocationSelector
@@ -455,13 +617,15 @@ const Step4 = ({
 
     {/* Payment Methods Section */}
     <div className="space-y-3">
-      <div className="flex items-center gap-2 text-lg font-semibold text-gray-700">
-        <svg width="22" height="22" className="text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 6v-2h8v2"/></svg>
-        <span>Preferred Payment Methods</span>
+      <div className="flex items-center gap-2 text-lg font-extrabold">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 p-1.5 rounded-lg shadow-md">
+          <svg width="18" height="18" className="text-white" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 6v-2h8v2"/></svg>
+        </div>
+        <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Preferred Payment Methods</span>
       </div>
       <div className="grid grid-cols-1 gap-3">
         {paymentMethods.map(method => (
-          <div key={method.name} className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-green-300 transition-colors">
+          <div key={method.name} className="flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:shadow-md transition-all duration-300 bg-white">
             <input
               type="checkbox"
               id={`pay-${method.name}`}
@@ -471,15 +635,6 @@ const Step4 = ({
               className="h-5 w-5 border-gray-400 text-green-600 focus:ring-green-500 rounded"
             />
             <label htmlFor={`pay-${method.name}`} className="ml-3 text-base font-medium text-gray-700 cursor-pointer">{method.label}</label>
-            {method.name === "other" && pay.includes("other") && (
-              <input
-                className="ml-3 flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                type="text"
-                value={otherPay}
-                placeholder="Please specify"
-                onChange={onOtherPayChange}
-              />
-            )}
           </div>
         ))}
       </div>
@@ -501,18 +656,21 @@ const HandymanRegistration = () => {
   const [personal, setPersonal] = useState(initialForm);
   const [photo, setPhoto] = useState<File | null>(null);
   const [certificate, setCertificate] = useState<File | null>(null);
+  const [nicFrontPhoto, setNicFrontPhoto] = useState<File | null>(null);
+  const [nicBackPhoto, setNicBackPhoto] = useState<File | null>(null);
   const [services, setServices] = useState<string[]>([]);
   const [otherService, setOtherService] = useState("");
   const [certs, setCerts] = useState<string[]>([]);
   const [days, setDays] = useState<string[]>([]);
   const [hours, setHours] = useState<string>("");
   const [pay, setPay] = useState<string[]>([]);
-  const [otherPay, setOtherPay] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [availableServices, setAvailableServices] = useState<any[]>([]);
   const [isLoadingClientData, setIsLoadingClientData] = useState(true);
   const [clientData, setClientData] = useState<any>(null);
+  const [nicError, setNicError] = useState<string>("");
+  const [mobileError, setMobileError] = useState<string>("");
   
   // Location autocomplete states
   const [locationInputValue, setLocationInputValue] = useState("");
@@ -600,7 +758,40 @@ const HandymanRegistration = () => {
   }
 
   const handlePersonalChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPersonal({ ...personal, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setPersonal({ ...personal, [name]: value });
+    
+    // Validate NIC in real-time
+    if (name === 'nic') {
+      const validation = validateNIC(value);
+      if (!validation.valid) {
+        setNicError(validation.message || '');
+      } else {
+        setNicError('');
+      }
+    }
+    
+    // Validate mobile number in real-time
+    if (name === 'contactNumber') {
+      const validation = validateMobileNumber(value);
+      if (!validation.valid) {
+        setMobileError(validation.message || '');
+      } else {
+        setMobileError('');
+      }
+    }
+  };
+  
+  const handleNicFrontPhoto = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNicFrontPhoto(e.target.files[0]);
+    }
+  };
+  
+  const handleNicBackPhoto = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNicBackPhoto(e.target.files[0]);
+    }
   };
 
   const handlePhoto = (e: ChangeEvent<HTMLInputElement>) => {
@@ -654,8 +845,6 @@ const HandymanRegistration = () => {
     else setPay(pay.filter((p) => p !== name));
   };
 
-  const handleOtherPayChange = (e: ChangeEvent<HTMLInputElement>) => setOtherPay(e.target.value);
-
   const handleLocationChange = (locationData: any) => {
     // Update both the location string and coordinates
     setPersonal({ ...personal, location: locationData.city || locationData.address });
@@ -682,6 +871,28 @@ const HandymanRegistration = () => {
     if (step === 0) {
       if (!personal.name || !personal.nic || !personal.contactNumber || !personal.emailAddress) {
         alert("Please fill in all required fields (Name, NIC, Contact, Email)");
+        return;
+      }
+      
+      // Validate NIC
+      const nicValidation = validateNIC(personal.nic);
+      if (!nicValidation.valid) {
+        setNicError(nicValidation.message || '');
+        alert(nicValidation.message || "Please enter a valid NIC number");
+        return;
+      }
+      
+      // Validate mobile number
+      const mobileValidation = validateMobileNumber(personal.contactNumber);
+      if (!mobileValidation.valid) {
+        setMobileError(mobileValidation.message || '');
+        alert(mobileValidation.message || "Please enter a valid mobile number");
+        return;
+      }
+      
+      // Validate NIC photos
+      if (!nicFrontPhoto || !nicBackPhoto) {
+        alert("Please upload both front and back photos of your NIC");
         return;
       }
     } else if (step === 1) {
@@ -714,6 +925,28 @@ const HandymanRegistration = () => {
     // Validate required fields
     if (!personal.name || !personal.nic || !personal.contactNumber || !personal.emailAddress) {
       alert("Please fill in all required fields (Name, NIC, Contact, Email)");
+      return;
+    }
+    
+    // Validate NIC
+    const nicValidation = validateNIC(personal.nic);
+    if (!nicValidation.valid) {
+      setNicError(nicValidation.message || '');
+      alert(nicValidation.message || "Please enter a valid NIC number");
+      return;
+    }
+    
+    // Validate mobile number
+    const mobileValidation = validateMobileNumber(personal.contactNumber);
+    if (!mobileValidation.valid) {
+      setMobileError(mobileValidation.message || '');
+      alert(mobileValidation.message || "Please enter a valid mobile number");
+      return;
+    }
+    
+    // Validate NIC photos
+    if (!nicFrontPhoto || !nicBackPhoto) {
+      alert("Please upload both front and back photos of your NIC");
       return;
     }
     
@@ -778,25 +1011,48 @@ const HandymanRegistration = () => {
         });
       }
 
+      // Convert NIC photos to base64
+      const nicFrontBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(nicFrontPhoto!);
+      });
+
+      const nicBackBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(nicBackPhoto!);
+      });
+
       // Prepare handyman data
+      // Ensure experience is a number (can be 0)
+      const experienceNum = personal.experience ? parseInt(personal.experience) : 0;
+      if (isNaN(experienceNum)) {
+        alert("Please provide a valid number for years of experience");
+        setIsSubmitting(false);
+        return;
+      }
+
       const handymanData = {
         clerkUserId: user?.id, // Add Clerk user ID
-        name: personal.name,
-        nic: personal.nic,
-        contactNumber: personal.contactNumber,
-        emailAddress: personal.emailAddress,
+        name: personal.name.trim(),
+        nic: personal.nic.trim(),
+        contactNumber: personal.contactNumber.trim(),
+        emailAddress: personal.emailAddress.trim(),
         personalPhoto: photoBase64,
-        certificate: certificateBase64, // Add certificate
-        experience: parseInt(personal.experience) || 0,
+        certificate: certificateBase64 || undefined, // Send undefined instead of null for optional field
+        nicFrontPhoto: nicFrontBase64, // Add NIC front photo
+        nicBackPhoto: nicBackBase64, // Add NIC back photo
+        experience: experienceNum, // Can be 0
         certifications: certs,
         services: services, // Only service IDs, no skills array
-        location: personal.location || '', // Add location field
-        coordinates: locationCoordinates, // Add coordinates for distance calculations
+        location: personal.location.trim(), // Add location field
+        coordinates: locationCoordinates || undefined, // Add coordinates for distance calculations
         availability: {
           workingDays: workingDaysString,
           workingHours: workingHoursArray.filter(hour => hour.trim() !== '').join(', '),
         },
-        paymentMethod: pay.filter(p => p !== 'other').join(', '),
+        paymentMethod: pay.join(', '),
       };
 
       // Register handyman with backend
@@ -848,17 +1104,21 @@ const HandymanRegistration = () => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen w-full bg-[#f6f7fa] flex flex-col items-center py-8">
-        <div className="w-full max-w-xl bg-white rounded-lg shadow p-6 md:p-10 mt-6 text-center">
-          <div className="mb-6">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
+      <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center py-8 px-4">
+        <div className="w-full max-w-xl bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 p-6 md:p-10 text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-200/20 rounded-full blur-2xl" />
+          <div className="relative z-10">
+            <div className="mb-6">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">Registration Successful!</h2>
+              <p className="text-gray-600">Your handyman registration has been completed successfully. You can now access handyman features.</p>
+              <p className="text-sm text-gray-500 mt-2">Redirecting to homepage...</p>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Registration Successful!</h2>
-            <p className="text-gray-600">Your handyman registration has been completed successfully. You can now access handyman features.</p>
-            <p className="text-sm text-gray-500 mt-2">Redirecting to homepage...</p>
           </div>
         </div>
       </div>
@@ -866,16 +1126,31 @@ const HandymanRegistration = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#f6f7fa] flex flex-col items-center py-8">
-      <div className="w-full max-w-xl bg-white rounded-lg shadow p-6 md:p-10 mt-6">
-        <h2 className="text-2xl md:text-2xl font-bold text-center text-gray-900">Handyman Registration</h2>
-        <p className="text-sm text-gray-600 text-center mb-4">
-          Fields marked with <span className="text-red-500">*</span> are required
-        </p>
-        <StepIndicator step={step} />
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center py-8 px-4">
+      <div className="w-full max-w-xl bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border-2 border-gray-100 p-6 md:p-10 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full blur-2xl" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-200/20 rounded-full blur-2xl" />
+        <div className="relative z-10">
+          <h2 className="text-2xl md:text-2xl font-extrabold text-center mb-2">
+            <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">Handyman Registration</span>
+          </h2>
+          <p className="text-sm text-gray-600 text-center mb-6">
+            Fields marked with <span className="text-red-500">*</span> are required
+          </p>
+          <StepIndicator step={step} />
         <form id="handyman-registration-form" onSubmit={handleSubmit} onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}>
           {step === 0 && (
-            <Step1 data={personal} onChange={handlePersonalChange} clientData={clientData} />
+            <Step1 
+              data={personal} 
+              onChange={handlePersonalChange} 
+              clientData={clientData}
+              nicFrontPhoto={nicFrontPhoto}
+              nicBackPhoto={nicBackPhoto}
+              onNicFrontPhoto={handleNicFrontPhoto}
+              onNicBackPhoto={handleNicBackPhoto}
+              nicError={nicError}
+              mobileError={mobileError}
+            />
           )}
 
           {step === 1 && (
@@ -910,8 +1185,6 @@ const HandymanRegistration = () => {
               onHoursChange={handleHoursChange}
               pay={pay}
               onPayChange={handlePayChange}
-              otherPay={otherPay}
-              onOtherPayChange={handleOtherPayChange}
               clientData={clientData}
               onLocationChange={handleLocationChange}
               locationInputValue={locationInputValue}
@@ -920,40 +1193,41 @@ const HandymanRegistration = () => {
           )}
         </form>
 
-        {/* Navigation buttons - moved outside form to prevent accidental submission */}
-        <div className="flex justify-between mt-8">
-          {step > 0 ? (
-            <button
-              type="button"
-              onClick={handleBack}
-              onMouseDown={(e) => e.preventDefault()}
-              className="inline-flex items-center gap-1 px-4 py-2 rounded bg-gray-100 text-gray-700 font-medium shadow hover:bg-gray-200 transition"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              Back
-            </button>
-          ) : (
-            <span />
-          )}
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              onMouseDown={(e) => e.preventDefault()}
-              className="inline-flex items-center gap-2 px-7 py-2 rounded bg-green-500 text-white font-medium shadow hover:bg-green-600 transition"
-            >
-              Next <ArrowRight className="h-4 w-4" />
-            </button>
-          ) : (
-            <button
-              type="submit"
-              form="handyman-registration-form"
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 px-7 py-2 rounded bg-green-500 text-white font-medium shadow hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
-          )}
+          {/* Navigation buttons - moved outside form to prevent accidental submission */}
+          <div className="flex justify-between mt-8">
+            {step > 0 ? (
+              <button
+                type="button"
+                onClick={handleBack}
+                onMouseDown={(e) => e.preventDefault()}
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold shadow-md hover:bg-gray-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                Back
+              </button>
+            ) : (
+              <span />
+            )}
+            {step < 3 ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                onMouseDown={(e) => e.preventDefault()}
+                className="inline-flex items-center gap-2 px-7 py-2 rounded-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
+                Next <ArrowRight className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                form="handyman-registration-form"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 px-7 py-2 rounded-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

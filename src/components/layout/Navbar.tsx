@@ -23,7 +23,7 @@ const Navbar = ({ showHandymanDashboard = false, showAdminDashboard = false }: N
             <Link to="/" className="flex items-center h-8 sm:h-10 transition-transform duration-300 hover:scale-105" onClick={() => setIsMobileMenuOpen(false)}>
               {/* LOGO IMAGE HOLDER */}
               <img
-                src="/lovable-uploads/a707e924-f315-4907-a798-16e19d2e7a69.png"
+                src="/images/a707e924-f315-4907-a798-16e19d2e7a69.webp"
                 alt="FixFinder Logo"
                 className="h-8 sm:h-10 object-contain"
                 style={{ maxWidth: 150 }}

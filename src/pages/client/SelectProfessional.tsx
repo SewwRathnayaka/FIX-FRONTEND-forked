@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useUser } from '@clerk/clerk-react';
 import ClientDashboardLayout from "@/components/client/ClientDashboardLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Filter } from "lucide-react";
+import { ArrowLeft, Filter, CreditCard } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import BookingDetailsDialog from "@/components/client/BookingDetailsDialog";
 import HandymanProfilePopup from "@/components/client/HandymanProfilePopup";
@@ -33,6 +33,7 @@ interface Professional {
   availability: {
     [key: string]: string[];
   };
+  onlinePaymentsEnabled?: boolean; // Whether Stripe account is set up and enabled for online payments
 }
 
 type SortOption = 'distance' | 'rating' | 'experience' | null;
@@ -146,9 +147,17 @@ const SelectProfessional = () => {
         const response = await HandymanAPI.getServiceProvidersByServiceId(service._id);
         
         if (response.success) {
+          // Debug: Log the response to see if onlinePaymentsEnabled is included
+          console.log('Professionals data:', response.data);
+          
           // Filter out the current user's own handyman profile to prevent self-booking
           const filteredProfessionals = response.data.filter((professional: Professional) => {
             return professional.userId !== user?.id;
+          });
+          
+          // Debug: Log each professional's onlinePaymentsEnabled status
+          filteredProfessionals.forEach((prof: Professional) => {
+            console.log(`${prof.name}: onlinePaymentsEnabled =`, prof.onlinePaymentsEnabled);
           });
           
           setProfessionals(filteredProfessionals);
@@ -330,6 +339,12 @@ const SelectProfessional = () => {
                         }`}>
                           {professional.status}
                         </span>
+                        {professional.onlinePaymentsEnabled === true && (
+                          <span className="text-xs px-3 py-1 rounded-full font-semibold shadow-md bg-gradient-to-r from-blue-500 to-indigo-600 text-white flex items-center gap-1">
+                            <CreditCard className="w-3 h-3" />
+                            Online Payments
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-gray-600 mb-2 font-medium">
                         {professional.services && professional.services.length > 0 

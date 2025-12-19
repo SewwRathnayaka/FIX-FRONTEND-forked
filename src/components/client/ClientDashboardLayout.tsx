@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Bell, User, Home, Wrench } from "lucide-react";
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useClerk } from '@clerk/clerk-react';
 import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
@@ -31,6 +31,7 @@ const ClientDashboardLayout = ({ children, title, subtitle, showHomeIcon = true,
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
   const { t } = useTranslation();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -59,11 +60,8 @@ const ClientDashboardLayout = ({ children, title, subtitle, showHomeIcon = true,
   // Authentication is now handled by ProtectedClientRoute wrapper
   // No need for manual checks here
 
-  const handleLogout = () => {
-    toast({
-      title: t("client.layout.menu.logout"),
-      description: t("client.layout.menu.logout")
-    });
+  const handleLogout = async () => {
+    await signOut();
     navigate("/");
   };
 
@@ -78,7 +76,7 @@ const ClientDashboardLayout = ({ children, title, subtitle, showHomeIcon = true,
             <div className="flex-1 flex items-center justify-center">
               <Link to="/" className="flex items-center h-8 sm:h-10">
                 <img
-                  src="/lovable-uploads/a707e924-f315-4907-a798-16e19d2e7a69.png"
+                  src="/images/a707e924-f315-4907-a798-16e19d2e7a69.webp"
                   alt="FixFinder Logo"
                   className="h-8 sm:h-10 object-contain"
                   style={{ maxWidth: 150 }}
@@ -205,7 +203,7 @@ const ClientDashboardLayout = ({ children, title, subtitle, showHomeIcon = true,
       <div className="w-full flex justify-center p-4 sm:p-5 bg-white border-t border-gray-200 shadow-xl">
         <div className="flex items-center">
           <img
-            src="/lovable-uploads/dd421578-d45c-4aa5-ac80-e96f8fe812e5.png"
+            src="/images/dd421578-d45c-4aa5-ac80-e96f8fe812e5.webp"
             alt="FixFinder New Logo"
             className="h-6 sm:h-8 object-contain"
             style={{ maxWidth: 120 }}
